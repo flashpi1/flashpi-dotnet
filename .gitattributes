@@ -1,0 +1,5 @@
+# Normalize line endings for everything we author.
+* text=auto eol=lf
+
+*.png binary
+*.p12 binary

@@ -1,0 +1,7 @@
+<Project>
+  <!-- Central package management: every package version of the repository is set here. -->
+  <ItemGroup Label="Runtime dependencies of the netstandard2.0 build (net10.0 has none)">
+    <PackageVersion Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.15" />
+    <PackageVersion Include="System.Text.Json" Version="10.0.15" />
+  </ItemGroup>
+</Project>

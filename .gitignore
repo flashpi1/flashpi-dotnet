@@ -1,0 +1,22 @@
+# Build output
+bin/
+obj/
+artifacts/
+dist/
+*.nupkg
+*.snupkg
+
+# Test output
+TestResults/
+coverage/
+*.coverage
+coverage.*.xml
+coverage.json
+
+# Editors and OS
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+.DS_Store
