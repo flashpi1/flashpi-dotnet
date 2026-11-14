@@ -6,7 +6,6 @@
     <TargetFrameworks>net10.0;netstandard2.0</TargetFrameworks>
     <RootNamespace>Flashpi</RootNamespace>
     <AssemblyName>Flashpi</AssemblyName>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Label="Package">
@@ -32,6 +31,10 @@
   <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0'">
     <IsAotCompatible>true</IsAotCompatible>
   </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Flashpi.Tests" />
+  </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" />
