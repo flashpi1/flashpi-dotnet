@@ -21,6 +21,8 @@
     <RepositoryType>git</RepositoryType>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <!-- NuGet shows the Spanish README, as npm and PyPI do; its links are absolute. -->
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>flashpi;sri;ecuador;facturacion-electronica;e-invoicing;invoice;api;sdk</PackageTags>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -34,6 +36,7 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="Flashpi.Tests" />
+    <None Include="../../README.md" Pack="true" PackagePath="/" Visible="false" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
