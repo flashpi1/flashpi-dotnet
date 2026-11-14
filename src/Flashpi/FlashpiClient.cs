@@ -157,7 +157,29 @@ public sealed class FlashpiClient : IDisposable
             AllowAutoRedirect = false,
             AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
         };
+        RemoveConnectionLimit(handler);
 #endif
         return new HttpClient(handler, disposeHandler: true) { Timeout = Timeout.InfiniteTimeSpan };
     }
+
+#if !NET
+    /// <summary>
+    /// .NET Framework allows 2 connections per server outside ASP.NET: calls would wait for one
+    /// while their deadline runs. Lifted as .NET does; .NET Framework before 4.7.1 has no such
+    /// setting, and keeps its limit.
+    /// </summary>
+    private static void RemoveConnectionLimit(HttpClientHandler handler)
+    {
+        try
+        {
+            SetMaxConnections(handler);
+        }
+        catch (Exception error) when (error is MissingMethodException or PlatformNotSupportedException or NotSupportedException)
+        {
+        }
+    }
+
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+    private static void SetMaxConnections(HttpClientHandler handler) => handler.MaxConnectionsPerServer = int.MaxValue;
+#endif
 }
