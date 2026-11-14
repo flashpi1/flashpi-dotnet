@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
@@ -83,7 +84,13 @@ internal static class ApiErrors
             }
             catch (JsonException)
             {
-                // A member of another type than the contract says: keep what can be read.
+                // A member of another type than the contract says: keep what can be read, the
+                // documentId a recovery needs included, and every member as JSON.
+                var members = new Dictionary<string, JsonElement>(StringComparer.Ordinal);
+                foreach (var member in root.EnumerateObject())
+                {
+                    members[member.Name] = member.Value.Clone();
+                }
                 return new ProblemDetails
                 {
                     Type = Member(root, "type")!,
@@ -94,6 +101,10 @@ internal static class ApiErrors
                     Code = new ErrorCode(code.GetString()!),
                     Errors = [],
                     RequestId = Member(root, "requestId")!,
+                    DocumentId = Member(root, "documentId"),
+                    ExpectedTotal = Member(root, "expectedTotal"),
+                    ComputedTotal = Member(root, "computedTotal"),
+                    AdditionalProperties = members,
                 };
             }
         }
@@ -132,7 +143,22 @@ internal static class RetryAfterHeader
     // Longer digit strings are past any useful wait.
     private const int MaxDeltaDigits = 18;
 
-    private static readonly string[] DateFormats = ["r", "ddd, d MMM yyyy H:m:s 'GMT'", "dddd, dd-MMM-yy HH:mm:ss 'GMT'", "ddd MMM d HH:mm:ss yyyy"];
+    // HTTP dates (RFC 9110: IMF-fixdate and the two obsolete forms), then ISO 8601 with a date,
+    // as Python's fromisoformat reads them. Nothing looser: a value that is not a date is ignored.
+    private static readonly string[] DateFormats =
+    [
+        "r",
+        "ddd, d MMM yyyy H:m:s 'GMT'",
+        "dddd, dd-MMM-yy HH:mm:ss 'GMT'",
+        "ddd MMM d HH:mm:ss yyyy",
+        "yyyy-MM-dd",
+        "yyyy-MM-dd'T'HH:mm",
+        "yyyy-MM-dd'T'HH:mmK",
+        "yyyy-MM-dd'T'HH:mm:ss",
+        "yyyy-MM-dd'T'HH:mm:ssK",
+        "yyyy-MM-dd'T'HH:mm:ss.FFFFFFF",
+        "yyyy-MM-dd'T'HH:mm:ss.FFFFFFFK",
+    ];
 
     /// <summary>The wait a <c>Retry-After</c> value asks for (delta-seconds or an HTTP date), or null.</summary>
     internal static TimeSpan? Parse(string? value, DateTimeOffset now)
@@ -151,8 +177,8 @@ internal static class RetryAfterHeader
             var seconds = long.Parse(trimmed, NumberStyles.None, CultureInfo.InvariantCulture);
             return seconds >= (long)TimeSpan.MaxValue.TotalSeconds ? TimeSpan.MaxValue : TimeSpan.FromSeconds(seconds);
         }
-        if (!DateTimeOffset.TryParseExact(trimmed, DateFormats, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AllowWhiteSpaces, out var moment)
-            && !DateTimeOffset.TryParse(trimmed, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out moment))
+        if (!DateTimeOffset.TryParseExact(
+            trimmed, DateFormats, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out var moment))
         {
             return null;
         }
