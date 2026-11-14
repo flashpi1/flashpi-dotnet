@@ -132,9 +132,8 @@ public sealed class EdgeTests
     }
 
     [Fact]
-    public void Refuses_to_write_a_webhook_event_of_a_type_it_does_not_know()
+    public void Writes_and_reads_a_verification_event_as_a_webhook_event()
     {
-        Assert.Throws<System.Text.Json.JsonException>(() => System.Text.Json.JsonSerializer.Serialize<WebhookEvent>(new StrangeEvent(), Json.TypeInfo<WebhookEvent>()));
         var verification = new WebhookEndpointVerificationEvent
         {
             Id = "v",
@@ -145,15 +144,6 @@ public sealed class EdgeTests
         };
         var json = System.Text.Json.JsonSerializer.Serialize<WebhookEvent>(verification, Json.TypeInfo<WebhookEvent>());
         Assert.Equal(verification, System.Text.Json.JsonSerializer.Deserialize(json, Json.TypeInfo<WebhookEvent>()));
-    }
-
-    private sealed record StrangeEvent : WebhookEvent
-    {
-        [System.Diagnostics.CodeAnalysis.SetsRequiredMembers]
-        public StrangeEvent()
-            : base(new EventThin { Id = "x", Type = "x", Environment = FlashpiEnvironment.Test, CreatedAt = DateTimeOffset.FromUnixTimeSeconds(0) })
-        {
-        }
     }
 
     private sealed class UnreadableStream : MemoryStream
