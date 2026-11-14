@@ -22,6 +22,7 @@ internal static class PackageCommand
     [
         "Flashpi.nuspec",
         "README.md",
+        "icon.png",
         "lib/net10.0/Flashpi.dll",
         "lib/net10.0/Flashpi.xml",
         "lib/netstandard2.0/Flashpi.dll",
@@ -135,9 +136,11 @@ internal static class PackageCommand
         {
             yield return $"the nuspec is not version {version}";
         }
-        if (metadata.Element(ns + "license")?.Value != "MIT" || metadata.Element(ns + "readme")?.Value != "README.md")
+        if (metadata.Element(ns + "license")?.Value != "MIT"
+            || metadata.Element(ns + "readme")?.Value != "README.md"
+            || metadata.Element(ns + "icon")?.Value != "icon.png")
         {
-            yield return "the license must be MIT and the readme README.md";
+            yield return "the license must be MIT, the readme README.md and the icon icon.png";
         }
         var groups = metadata.Element(ns + "dependencies")?.Elements(ns + "group").ToList() ?? [];
         var found = groups.ToDictionary(
