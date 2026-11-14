@@ -12,10 +12,26 @@ internal static class Program
         Usage:
           dotnet run --project tools/Flashpi.Tools -- openapi sync|generate|check
           dotnet run --project tools/Flashpi.Tools -- readme generate|check
+          dotnet run --project tools/Flashpi.Tools -- package check <directory> [version]
+          dotnet run --project tools/Flashpi.Tools -- coverage check <directory> [percent]
         """;
 
     public static async Task<int> Main(string[] args)
     {
+        if (args.Length is 3 or 4 && args[0] is "package" or "coverage" && args[1] == "check")
+        {
+            try
+            {
+                return args[0] == "package"
+                    ? Package.PackageCommand.Check(args[2], args.Length == 4 ? args[3] : null)
+                    : Coverage.CoverageCommand.Check(args[2], args.Length == 4 ? args[3] : "95");
+            }
+            catch (GenerationException error)
+            {
+                await Console.Error.WriteLineAsync($"error: {error.Message}").ConfigureAwait(false);
+                return 1;
+            }
+        }
         if (args.Length != 2)
         {
             await Console.Error.WriteLineAsync(Usage).ConfigureAwait(false);
