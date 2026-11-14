@@ -573,6 +573,13 @@ internal sealed partial class Generator
             {
                 throw new GenerationException($"{where}: two definitions are named {name}");
             }
+            // A place shared by member name (*.environment) must hold the same values: a new
+            // member of that name with other values is something else.
+            if (place is not null && !EnumNames.ContainsKey(place) && !known.Values.ToHashSet(StringComparer.Ordinal).SetEquals(values))
+            {
+                throw new GenerationException(
+                    $"{where}: its values differ from those of {name}, which every {place[place.IndexOf('.', StringComparison.Ordinal)..]} shares: name it in EnumNames");
+            }
             known.Values.AddRange(values.Where(value => !known.Values.Contains(value)));
         }
         else
@@ -1063,8 +1070,8 @@ internal sealed partial class Generator
         output.Append(Indent).Append($"public static bool operator ==({name} left, {name} right) => left.Equals(right);\n\n");
         AppendDoc(output, "Whether the values differ.", Indent);
         output.Append(Indent).Append($"public static bool operator !=({name} left, {name} right) => !left.Equals(right);\n\n");
-        AppendDoc(output, "The value of a text as the API writes it.", Indent);
-        output.Append(Indent).Append($"public static implicit operator {name}(string value) => new(value);\n\n");
+        AppendDoc(output, "The value of a text as the API writes it; null is the default (empty) value, as a JSON null reads.", Indent);
+        output.Append(Indent).Append($"public static implicit operator {name}(string? value) => value is null ? default : new(value);\n\n");
         AppendDoc(output, "Whether both values are the same (ordinal comparison).", Indent);
         output.Append(Indent).Append($"public bool Equals({name} other) => string.Equals(Value, other.Value, StringComparison.Ordinal);\n\n");
         AppendDoc(output, "Whether the object is the same value.", Indent);

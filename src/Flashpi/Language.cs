@@ -30,11 +30,11 @@ public readonly struct Language : IEquatable<Language>
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(Language left, Language right) => !left.Equals(right);
 
-    /// <summary>The language of a text such as <c>es</c>.</summary>
-    public static implicit operator Language(string value) => new(value);
+    /// <summary>The language of a text such as <c>es</c>; null is the default value, which sends none.</summary>
+    public static implicit operator Language(string? value) => FromString(value);
 
-    /// <summary>The language of a text such as <c>es</c>.</summary>
-    public static Language FromString(string value) => new(value);
+    /// <summary>The language of a text such as <c>es</c>; null is the default value, which sends none.</summary>
+    public static Language FromString(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(Language other) => string.Equals(Value, other.Value, StringComparison.Ordinal);

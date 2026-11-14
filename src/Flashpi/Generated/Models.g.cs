@@ -84,8 +84,11 @@ public readonly partial struct AccountEmailSendingPauseReason : IEquatable<Accou
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(AccountEmailSendingPauseReason left, AccountEmailSendingPauseReason right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator AccountEmailSendingPauseReason(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator AccountEmailSendingPauseReason(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(AccountEmailSendingPauseReason other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -138,8 +141,11 @@ public readonly partial struct AccountEmailSendingStatus : IEquatable<AccountEma
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(AccountEmailSendingStatus left, AccountEmailSendingStatus right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator AccountEmailSendingStatus(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator AccountEmailSendingStatus(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(AccountEmailSendingStatus other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -243,8 +249,11 @@ public readonly partial struct ApiStatusKind : IEquatable<ApiStatusKind>, ICompa
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(ApiStatusKind left, ApiStatusKind right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator ApiStatusKind(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator ApiStatusKind(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(ApiStatusKind other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -476,8 +485,11 @@ public readonly partial struct CertificateRevocationBlockedReason : IEquatable<C
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(CertificateRevocationBlockedReason left, CertificateRevocationBlockedReason right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator CertificateRevocationBlockedReason(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator CertificateRevocationBlockedReason(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(CertificateRevocationBlockedReason other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -536,8 +548,11 @@ public readonly partial struct CertificateRevocationStatus : IEquatable<Certific
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(CertificateRevocationStatus left, CertificateRevocationStatus right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator CertificateRevocationStatus(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator CertificateRevocationStatus(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(CertificateRevocationStatus other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -593,8 +608,11 @@ public readonly partial struct CertificateStatus : IEquatable<CertificateStatus>
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(CertificateStatus left, CertificateStatus right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator CertificateStatus(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator CertificateStatus(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(CertificateStatus other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -1510,8 +1528,11 @@ public readonly partial struct DocumentEmailDeliveryStatus : IEquatable<Document
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(DocumentEmailDeliveryStatus left, DocumentEmailDeliveryStatus right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator DocumentEmailDeliveryStatus(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator DocumentEmailDeliveryStatus(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(DocumentEmailDeliveryStatus other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -1584,8 +1605,11 @@ public readonly partial struct DocumentEmailStatus : IEquatable<DocumentEmailSta
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(DocumentEmailStatus left, DocumentEmailStatus right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator DocumentEmailStatus(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator DocumentEmailStatus(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(DocumentEmailStatus other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -1660,8 +1684,11 @@ public readonly partial struct DocumentEmailWarningCode : IEquatable<DocumentEma
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(DocumentEmailWarningCode left, DocumentEmailWarningCode right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator DocumentEmailWarningCode(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator DocumentEmailWarningCode(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(DocumentEmailWarningCode other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -1772,8 +1799,11 @@ public readonly partial struct DocumentFailureCode : IEquatable<DocumentFailureC
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(DocumentFailureCode left, DocumentFailureCode right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator DocumentFailureCode(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator DocumentFailureCode(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(DocumentFailureCode other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -2025,8 +2055,11 @@ public readonly partial struct DocumentPaymentTermUnit : IEquatable<DocumentPaym
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(DocumentPaymentTermUnit left, DocumentPaymentTermUnit right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator DocumentPaymentTermUnit(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator DocumentPaymentTermUnit(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(DocumentPaymentTermUnit other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -2099,8 +2132,11 @@ public readonly partial struct DocumentRideTemplate : IEquatable<DocumentRideTem
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(DocumentRideTemplate left, DocumentRideTemplate right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator DocumentRideTemplate(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator DocumentRideTemplate(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(DocumentRideTemplate other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -2170,8 +2206,11 @@ public readonly partial struct DocumentSriMessageSeverity : IEquatable<DocumentS
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(DocumentSriMessageSeverity left, DocumentSriMessageSeverity right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator DocumentSriMessageSeverity(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator DocumentSriMessageSeverity(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(DocumentSriMessageSeverity other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -2236,8 +2275,11 @@ public readonly partial struct DocumentStatus : IEquatable<DocumentStatus>, ICom
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(DocumentStatus left, DocumentStatus right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator DocumentStatus(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator DocumentStatus(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(DocumentStatus other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -2387,8 +2429,11 @@ public readonly partial struct DocumentType : IEquatable<DocumentType>, ICompara
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(DocumentType left, DocumentType right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator DocumentType(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator DocumentType(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(DocumentType other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -2653,8 +2698,11 @@ public readonly partial struct ErrorCode : IEquatable<ErrorCode>, IComparable<Er
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(ErrorCode left, ErrorCode right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator ErrorCode(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator ErrorCode(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(ErrorCode other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -2965,8 +3013,11 @@ public readonly partial struct EventType : IEquatable<EventType>, IComparable<Ev
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(EventType left, EventType right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator EventType(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator EventType(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(EventType other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -3130,8 +3181,11 @@ public readonly partial struct FieldErrorCode : IEquatable<FieldErrorCode>, ICom
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(FieldErrorCode left, FieldErrorCode right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator FieldErrorCode(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator FieldErrorCode(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(FieldErrorCode other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -3185,8 +3239,11 @@ public readonly partial struct FlashpiEnvironment : IEquatable<FlashpiEnvironmen
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(FlashpiEnvironment left, FlashpiEnvironment right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator FlashpiEnvironment(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator FlashpiEnvironment(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(FlashpiEnvironment other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -3248,8 +3305,11 @@ public readonly partial struct IdType : IEquatable<IdType>, IComparable<IdType>
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(IdType left, IdType right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator IdType(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator IdType(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(IdType other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -3594,8 +3654,11 @@ public readonly partial struct IssuerOnboardingIdentificationRucSource : IEquata
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(IssuerOnboardingIdentificationRucSource left, IssuerOnboardingIdentificationRucSource right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator IssuerOnboardingIdentificationRucSource(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator IssuerOnboardingIdentificationRucSource(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(IssuerOnboardingIdentificationRucSource other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -3719,8 +3782,11 @@ public readonly partial struct IssuerOnboardingPrefillTaxProfileRimpeRegime : IE
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(IssuerOnboardingPrefillTaxProfileRimpeRegime left, IssuerOnboardingPrefillTaxProfileRimpeRegime right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator IssuerOnboardingPrefillTaxProfileRimpeRegime(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator IssuerOnboardingPrefillTaxProfileRimpeRegime(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(IssuerOnboardingPrefillTaxProfileRimpeRegime other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -3870,8 +3936,11 @@ public readonly partial struct IssuerOnboardingSriProfileRimpeRegime : IEquatabl
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(IssuerOnboardingSriProfileRimpeRegime left, IssuerOnboardingSriProfileRimpeRegime right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator IssuerOnboardingSriProfileRimpeRegime(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator IssuerOnboardingSriProfileRimpeRegime(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(IssuerOnboardingSriProfileRimpeRegime other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -3930,8 +3999,11 @@ public readonly partial struct IssuerOnboardingSriStatus : IEquatable<IssuerOnbo
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(IssuerOnboardingSriStatus left, IssuerOnboardingSriStatus right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator IssuerOnboardingSriStatus(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator IssuerOnboardingSriStatus(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(IssuerOnboardingSriStatus other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -3990,8 +4062,11 @@ public readonly partial struct IssuerOnboardingSriWarningsItem : IEquatable<Issu
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(IssuerOnboardingSriWarningsItem left, IssuerOnboardingSriWarningsItem right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator IssuerOnboardingSriWarningsItem(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator IssuerOnboardingSriWarningsItem(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(IssuerOnboardingSriWarningsItem other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -4053,8 +4128,11 @@ public readonly partial struct IssuerOnboardingStatus : IEquatable<IssuerOnboard
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(IssuerOnboardingStatus left, IssuerOnboardingStatus right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator IssuerOnboardingStatus(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator IssuerOnboardingStatus(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(IssuerOnboardingStatus other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -4347,8 +4425,11 @@ public readonly partial struct ModifiedDocumentType : IEquatable<ModifiedDocumen
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(ModifiedDocumentType left, ModifiedDocumentType right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator ModifiedDocumentType(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator ModifiedDocumentType(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(ModifiedDocumentType other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -4417,8 +4498,11 @@ public readonly partial struct PayloadMode : IEquatable<PayloadMode>, IComparabl
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(PayloadMode left, PayloadMode right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator PayloadMode(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator PayloadMode(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(PayloadMode other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -4489,8 +4573,11 @@ public readonly partial struct PaymentMethod : IEquatable<PaymentMethod>, ICompa
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(PaymentMethod left, PaymentMethod right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator PaymentMethod(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator PaymentMethod(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(PaymentMethod other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -4642,8 +4729,11 @@ public readonly partial struct RideStatus : IEquatable<RideStatus>, IComparable<
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(RideStatus left, RideStatus right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator RideStatus(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator RideStatus(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(RideStatus other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -4697,8 +4787,11 @@ public readonly partial struct RimpeRegime : IEquatable<RimpeRegime>, IComparabl
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(RimpeRegime left, RimpeRegime right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator RimpeRegime(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator RimpeRegime(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(RimpeRegime other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -4831,8 +4924,11 @@ public readonly partial struct SupportingDocumentPaymentResidence : IEquatable<S
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(SupportingDocumentPaymentResidence left, SupportingDocumentPaymentResidence right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator SupportingDocumentPaymentResidence(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator SupportingDocumentPaymentResidence(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(SupportingDocumentPaymentResidence other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -4927,8 +5023,11 @@ public readonly partial struct SupportingDocumentTaxRate : IEquatable<Supporting
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(SupportingDocumentTaxRate left, SupportingDocumentTaxRate right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator SupportingDocumentTaxRate(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator SupportingDocumentTaxRate(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(SupportingDocumentTaxRate other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -4978,8 +5077,11 @@ public readonly partial struct SupportingDocumentTaxType : IEquatable<Supporting
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(SupportingDocumentTaxType left, SupportingDocumentTaxType right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator SupportingDocumentTaxType(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator SupportingDocumentTaxType(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(SupportingDocumentTaxType other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -5032,8 +5134,11 @@ public readonly partial struct TaxType : IEquatable<TaxType>, IComparable<TaxTyp
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(TaxType left, TaxType right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator TaxType(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator TaxType(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(TaxType other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -5437,8 +5542,11 @@ public readonly partial struct WebhookDeliveryAttemptTrigger : IEquatable<Webhoo
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(WebhookDeliveryAttemptTrigger left, WebhookDeliveryAttemptTrigger right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator WebhookDeliveryAttemptTrigger(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator WebhookDeliveryAttemptTrigger(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(WebhookDeliveryAttemptTrigger other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -5613,8 +5721,11 @@ public readonly partial struct WebhookDeliveryStatus : IEquatable<WebhookDeliver
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(WebhookDeliveryStatus left, WebhookDeliveryStatus right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator WebhookDeliveryStatus(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator WebhookDeliveryStatus(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(WebhookDeliveryStatus other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -5795,8 +5906,11 @@ public readonly partial struct WebhookEndpointStatus : IEquatable<WebhookEndpoin
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(WebhookEndpointStatus left, WebhookEndpointStatus right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator WebhookEndpointStatus(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator WebhookEndpointStatus(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(WebhookEndpointStatus other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -5948,8 +6062,11 @@ public readonly partial struct WithheldSubjectSubjectType : IEquatable<WithheldS
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(WithheldSubjectSubjectType left, WithheldSubjectSubjectType right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator WithheldSubjectSubjectType(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator WithheldSubjectSubjectType(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(WithheldSubjectSubjectType other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -6110,8 +6227,11 @@ public readonly partial struct WithholdingForeignPaymentRegime : IEquatable<With
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(WithholdingForeignPaymentRegime left, WithholdingForeignPaymentRegime right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator WithholdingForeignPaymentRegime(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator WithholdingForeignPaymentRegime(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(WithholdingForeignPaymentRegime other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
@@ -6180,8 +6300,11 @@ public readonly partial struct WithholdingTax : IEquatable<WithholdingTax>, ICom
     /// <summary>Whether the values differ.</summary>
     public static bool operator !=(WithholdingTax left, WithholdingTax right) => !left.Equals(right);
 
-    /// <summary>The value of a text as the API writes it.</summary>
-    public static implicit operator WithholdingTax(string value) => new(value);
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator WithholdingTax(string? value) => value is null ? default : new(value);
 
     /// <summary>Whether both values are the same (ordinal comparison).</summary>
     public bool Equals(WithholdingTax other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
