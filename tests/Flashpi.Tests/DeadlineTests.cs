@@ -28,6 +28,7 @@ public sealed class DeadlineTests
             }
         });
         using var client = server.Client(TimeSpan.FromMilliseconds(400));
+        await WarmUpAsync(() => client.Status.GetAsync());
         var watch = Stopwatch.StartNew();
         var error = await Assert.ThrowsAsync<ApiTimeoutException>(() => client.Status.GetAsync());
         Assert.Contains("timed out after 0.4 seconds", error.Message);
@@ -39,6 +40,7 @@ public sealed class DeadlineTests
     {
         using var server = new SlowServer(_ => Task.Delay(5000));
         using var client = server.Client(TimeSpan.FromMilliseconds(300));
+        await WarmUpAsync(() => client.Status.GetAsync());
         var watch = Stopwatch.StartNew();
         await Assert.ThrowsAsync<ApiTimeoutException>(() => client.Status.GetAsync());
         Assert.True(watch.Elapsed < TimeSpan.FromSeconds(2));
@@ -67,11 +69,23 @@ public sealed class DeadlineTests
             await Task.Delay(5000);
         });
         using var client = server.Client(TimeSpan.FromSeconds(30));
+        await WarmUpAsync(async () =>
+        {
+            using var first = new CancellationTokenSource(TimeSpan.FromMilliseconds(300));
+            await client.Status.GetAsync(cancellationToken: first.Token);
+        });
         using var cancel = new CancellationTokenSource(TimeSpan.FromMilliseconds(300));
         var watch = Stopwatch.StartNew();
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() => client.Status.GetAsync(cancellationToken: cancel.Token));
         Assert.True(watch.Elapsed < TimeSpan.FromSeconds(3));
     }
+
+    /// <summary>
+    /// A first call that fails as the measured one will: it also loads and compiles the SDK's
+    /// code (seconds on .NET Framework on a busy runner), which no deadline covers, so the time
+    /// is measured on the next call.
+    /// </summary>
+    private static Task WarmUpAsync(Func<Task> call) => Assert.ThrowsAnyAsync<Exception>(call);
 
     [Fact]
     public async Task Reports_a_closed_connection_as_a_connection_error()
