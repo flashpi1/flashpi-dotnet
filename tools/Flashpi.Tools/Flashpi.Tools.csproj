@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="Flashpi.Tests" />
+    <InternalsVisibleTo Include="Flashpi.Tests" Key="$(FlashpiPublicKey)" />
   </ItemGroup>
 
 </Project>

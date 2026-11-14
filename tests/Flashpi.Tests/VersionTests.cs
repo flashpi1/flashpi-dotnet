@@ -15,6 +15,10 @@ public sealed class VersionTests
         Assert.Equal(Internal.SdkVersion.Value, version);
     }
 
+    [Fact]
+    public void The_assembly_is_strong_named_with_the_repository_key() =>
+        Assert.Equal([0xef, 0x9a, 0xa8, 0x17, 0x23, 0x2f, 0x07, 0x1d], typeof(FlashpiClient).Assembly.GetName().GetPublicKeyToken());
+
     internal static string RepositoryRoot()
     {
         for (var directory = new DirectoryInfo(AppContext.BaseDirectory); directory is not null; directory = directory.Parent)

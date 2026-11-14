@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Reflection;
+using System.Reflection.Metadata;
+using System.Reflection.PortableExecutable;
 using System.Xml.Linq;
 using Flashpi.Tools.OpenApi;
 
@@ -10,7 +13,8 @@ namespace Flashpi.Tools.Package;
 
 /// <summary>
 /// Checks what NuGet would get: the files of the .nupkg in a directory, file by file, its
-/// dependencies by target, and the symbols package. <c>package check dist [version]</c>.
+/// dependencies by target, the strong-name signature of its assemblies, and the symbols package.
+/// <c>package check dist [version]</c>.
 /// </summary>
 internal static class PackageCommand
 {
@@ -30,6 +34,9 @@ internal static class PackageCommand
         "lib/net10.0/Flashpi.pdb",
         "lib/netstandard2.0/Flashpi.pdb",
     ];
+
+    /// <summary>The public key token of Flashpi.snk, which every build of Flashpi.dll carries.</summary>
+    private static readonly byte[] PublicKeyToken = [0xef, 0x9a, 0xa8, 0x17, 0x23, 0x2f, 0x07, 0x1d];
 
     /// <summary>The dependencies of each target: net10.0 has none.</summary>
     private static readonly Dictionary<string, string[]> Dependencies = new(StringComparer.Ordinal)
@@ -55,6 +62,7 @@ internal static class PackageCommand
         problems.AddRange(CheckEntries(nupkg, Files));
         problems.AddRange(CheckEntries(symbols[0], SymbolFiles));
         problems.AddRange(CheckNuspec(nupkg, version));
+        problems.AddRange(CheckSignatures(nupkg));
         foreach (var problem in problems)
         {
             Console.Error.WriteLine($"error: {problem}");
@@ -83,6 +91,33 @@ internal static class PackageCommand
         {
             yield return $"{Path.GetFileName(path)} holds an unexpected {extra}";
         }
+    }
+
+    /// <summary>Every assembly is fully signed (not delay- or public-signed) with Flashpi.snk.</summary>
+    private static List<string> CheckSignatures(string path)
+    {
+        var problems = new List<string>();
+        using var archive = ZipFile.OpenRead(path);
+        foreach (var entry in archive.Entries.Where(entry => entry.FullName.EndsWith(".dll", StringComparison.Ordinal)))
+        {
+            using var buffer = new MemoryStream();
+            using (var stream = entry.Open())
+            {
+                stream.CopyTo(buffer);
+            }
+            buffer.Position = 0;
+            using var reader = new PEReader(buffer);
+            var signed = reader.PEHeaders.CorHeader is { } header && header.Flags.HasFlag(CorFlags.StrongNameSigned);
+            var metadata = reader.GetMetadataReader();
+            var name = new AssemblyName();
+            name.SetPublicKey(metadata.GetBlobBytes(metadata.GetAssemblyDefinition().PublicKey));
+            var token = name.GetPublicKeyToken() ?? [];
+            if (!signed || !token.SequenceEqual(PublicKeyToken))
+            {
+                problems.Add($"{entry.FullName} is not strong-named with Flashpi.snk (public key token {Convert.ToHexStringLower(token)})");
+            }
+        }
+        return problems;
     }
 
     private static IEnumerable<string> CheckNuspec(string path, string? version)

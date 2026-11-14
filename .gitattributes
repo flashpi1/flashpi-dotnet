@@ -3,6 +3,7 @@
 
 *.png binary
 *.p12 binary
+*.snk binary
 
 # A copy of the public OpenAPI document of the Flashpi API (`openapi sync` of tools/Flashpi.Tools).
 openapi/openapi.json linguist-generated

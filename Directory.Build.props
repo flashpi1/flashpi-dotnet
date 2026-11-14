@@ -14,6 +14,13 @@
          public member (CS1591). -->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn Condition="'$(MSBuildProjectName)' != 'Flashpi'">$(NoWarn);CS1591</NoWarn>
+    <!-- Every assembly is strong-named with the repository's key, which is public (Microsoft's
+         advice for open-source libraries): signed .NET Framework apps can only load signed
+         assemblies. Changing the key breaks every user's build, so it never changes. -->
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)Flashpi.snk</AssemblyOriginatorKeyFile>
+    <!-- Its public key, for InternalsVisibleTo (public key token ef9aa817232f071d). -->
+    <FlashpiPublicKey>00240000048000009400000006020000002400005253413100040000010001003b5935de8f69cfd841c9157e2dd12f581af9b5dba8e679969c316f5088a62b536e99e8d8b865b1c5204218b8ef1a28728e0dc2c4734e3fbf7f0c48be9d75efa2a832059e39c1f7bd419e31e71ca3e10be9be8da0834eebb8ba5e8f1c8ef9c165cf4d25b1b1c864d8a4b6cfda3335fe4fc0f8ac60cef43067e51ebec07071dba6</FlashpiPublicKey>
     <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
     <!-- Package versions live in Directory.Packages.props. -->
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
