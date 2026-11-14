@@ -27,6 +27,16 @@ internal static class Json
             TypeInfoResolver = FlashpiJsonContext.Default.WithAddedModifier(Modify),
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            // A null where the contract promises a number, a boolean or a date reads as its
+            // default, as a missing member and an enum's null do.
+            Converters =
+            {
+                new NullAsDefault<bool>(JsonMetadataServices.BooleanConverter),
+                new NullAsDefault<int>(JsonMetadataServices.Int32Converter),
+                new NullAsDefault<long>(JsonMetadataServices.Int64Converter),
+                new NullAsDefault<double>(JsonMetadataServices.DoubleConverter),
+                new NullAsDefault<DateTimeOffset>(JsonMetadataServices.DateTimeOffsetConverter),
+            },
         };
         options.MakeReadOnly();
         return options;
@@ -90,6 +100,18 @@ internal static class Json
             }
         }
         return pairs;
+    }
+
+    /// <summary>A value type's converter that reads null as the default value.</summary>
+    private sealed class NullAsDefault<T>(JsonConverter<T> inner) : JsonConverter<T>
+        where T : struct
+    {
+        public override bool HandleNull => true;
+
+        public override T Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) =>
+            reader.TokenType == JsonTokenType.Null ? default : inner.Read(ref reader, typeToConvert, options);
+
+        public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options) => inner.Write(writer, value, options);
     }
 
     private static class TypeInfoCache<T>
