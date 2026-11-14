@@ -3,3 +3,8 @@
 
 *.png binary
 *.p12 binary
+
+# A copy of the public OpenAPI document of the Flashpi API (`openapi sync` of tools/Flashpi.Tools).
+openapi/openapi.json linguist-generated
+# Generated from that copy (`openapi generate`).
+src/Flashpi/Generated/Models.g.cs linguist-generated
