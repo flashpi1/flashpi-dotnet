@@ -1,0 +1,50 @@
+name: Live API test
+
+# Runs tests/Flashpi.LiveTests against the real Flashpi API in test mode (SRI pruebas): it issues
+# ONE test invoice on the shared demo issuer (daily quota of 50 per account). So it only runs when
+# the Release workflow dispatches it on release-please's pull request, or by hand.
+#
+# Needs the organization secret FLASHPI_TEST_API_KEY (an fp_test_ key with read_write access) and
+# the organization variable FLASHPI_DEMO_ISSUER_ID (the demo issuer id from the console), shared
+# with this repository.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: live-api
+  cancel-in-progress: false
+
+env:
+  DOTNET_NOLOGO: '1'
+  DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+
+jobs:
+  live:
+    name: SDK against the live API (test mode)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          dotnet-version: '10.0.x'
+      - run: dotnet build tests/Flashpi.LiveTests
+      - name: Check the secret and the variable are set
+        env:
+          FLASHPI_TEST_API_KEY: ${{ secrets.FLASHPI_TEST_API_KEY }}
+          FLASHPI_DEMO_ISSUER_ID: ${{ vars.FLASHPI_DEMO_ISSUER_ID }}
+        run: |
+          if [ -z "$FLASHPI_TEST_API_KEY" ] || [ -z "$FLASHPI_DEMO_ISSUER_ID" ]; then
+            echo "::error::Set the FLASHPI_TEST_API_KEY secret and the FLASHPI_DEMO_ISSUER_ID variable"
+            exit 1
+          fi
+      - name: Run the live suite
+        env:
+          FLASHPI_TEST_API_KEY: ${{ secrets.FLASHPI_TEST_API_KEY }}
+          FLASHPI_DEMO_ISSUER_ID: ${{ vars.FLASHPI_DEMO_ISSUER_ID }}
+        run: dotnet test --project tests/Flashpi.LiveTests --no-build

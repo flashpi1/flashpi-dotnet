@@ -1,0 +1,139 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  # By hand: gh workflow run ci.yml --ref <branch>. Such a run does not count for a pull
+  # request's required checks, which only take push and pull_request runs.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: '1'
+  DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+
+# Third-party actions are pinned to full commit SHAs (the comment is the release).
+jobs:
+  verify:
+    name: Format, generate and test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up .NET 10
+        uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore Flashpi.slnx
+
+      - name: Check the generated models match the committed OpenAPI document
+        run: dotnet run --project tools/Flashpi.Tools --no-restore -- openapi check
+
+      - name: Check the README examples match the READMEs
+        run: dotnet run --project tools/Flashpi.Tools --no-restore -- readme check
+
+      - name: Check formatting
+        run: dotnet format Flashpi.slnx --no-restore --verify-no-changes
+
+      # The library (both targets), the README examples, the tests and the tooling, with the
+      # analyzers and warnings as errors.
+      - name: Build
+        run: dotnet build Flashpi.slnx --no-restore -c Release
+
+      - name: Test with coverage
+        run: >-
+          dotnet test --project tests/Flashpi.Tests --no-build -c Release
+          --coverlet --coverlet-output-format cobertura --coverlet-include "[Flashpi]*"
+          --coverlet-exclude-by-attribute GeneratedCode --results-directory "${{ runner.temp }}/coverage"
+
+      - name: Check the coverage (95 % of the lines written by hand)
+        run: dotnet run --project tools/Flashpi.Tools --no-build -c Release -- coverage check "${{ runner.temp }}/coverage" 95
+
+  dotnet11:
+    name: .NET 11
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          dotnet-version: '11.0.x'
+      # The net10.0 build of the SDK, on .NET 11 and with its SDK and analyzers.
+      - run: dotnet test --project tests/Flashpi.Tests -p:TestTargetFrameworks=net11.0
+
+  netstandard:
+    name: .NET 8 (netstandard2.0 build)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+      # A net8.0 project gets the netstandard2.0 build, with the System.Text.Json package.
+      - run: dotnet test --project tests/Flashpi.Tests -p:TestTargetFrameworks=net8.0
+
+  framework:
+    name: .NET Framework 4.8 (netstandard2.0 build)
+    runs-on: windows-2025
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          dotnet-version: '10.0.x'
+      - run: dotnet test --project tests/Flashpi.Tests -p:TestTargetFrameworks=net48
+      - name: Install the package and use it on .NET Framework
+        shell: bash
+        run: |
+          dotnet pack src/Flashpi -c Release -o dist
+          dotnet run --project tests/Flashpi.InstalledCheck -f net48 -p:FlashpiVersion=0.0.0
+
+  package:
+    name: Pack and install
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      # Package validation checks that both builds expose the same API.
+      - name: Pack the package and its symbols
+        run: dotnet pack src/Flashpi -c Release -o dist
+
+      - name: Check what NuGet would get
+        run: dotnet run --project tools/Flashpi.Tools -- package check dist
+
+      - name: Install the package in a clean project and use it
+        run: |
+          version=$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' src/Flashpi/Flashpi.csproj)
+          for framework in net10.0 net8.0; do
+            dotnet run --project tests/Flashpi.InstalledCheck -f "$framework" -p:FlashpiVersion="$version"
+          done
