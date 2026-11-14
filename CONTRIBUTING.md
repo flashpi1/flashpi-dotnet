@@ -6,8 +6,8 @@ changing them.
 
 ## Setup
 
-The [.NET SDK](https://dotnet.microsoft.com/download) 10.0.100 or later (`global.json` rolls
-forward to newer ones). Without a local SDK, the official image works:
+The [.NET SDK](https://dotnet.microsoft.com/download) 10.0.100 or a later 10.0 SDK (`global.json`
+rolls forward within 10.0; CI's .NET 11 job rewrites it to use .NET 11's SDK). Without a local SDK, the official image works:
 
 ```bash
 docker run --rm -v "$PWD":/src -w /src mcr.microsoft.com/dotnet/sdk:10.0 dotnet test --project tests/Flashpi.Tests
@@ -44,7 +44,7 @@ dotnet test --project tests/Flashpi.Tests
   ```bash
   dotnet pack src/Flashpi -c Release -o dist
   dotnet run --project tools/Flashpi.Tools -- package check dist
-  dotnet run --project tests/Flashpi.InstalledCheck -f net10.0 -p:FlashpiVersion=0.0.0
+  dotnet run --project tests/Flashpi.InstalledCheck -f net10.0 -p:FlashpiVersion="$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' src/Flashpi/Flashpi.csproj)"
   ```
 
 - `dotnet test --project tests/Flashpi.LiveTests` calls the real API in test mode. It needs
@@ -121,9 +121,10 @@ GitHub waits for that approval. If the publish job fails because they expired an
 and re-run the "Build the release" job alone (not "Re-run all jobs", which skips the release once
 it exists): the publish job runs again after it and waits for approval.
 
-The release's build job pins the .NET SDK by version (`dotnet-version` in `release.yml`), so no new
-SDK reaches a published version by itself; Dependabot does not update it. Raise it by hand to a
-10.0 SDK released at least two weeks earlier.
+The release's build job pins the .NET SDK by version (`RELEASE_SDK` in `release.yml`, written into
+`global.json` with roll-forward disabled, since the runner image also has newer SDKs), so no new SDK
+reaches a published version by itself; Dependabot does not update it. Raise it by hand to a 10.0 SDK
+released at least two weeks earlier.
 
 ### NuGet trusted publishing
 
@@ -137,7 +138,8 @@ Connect. Before the first release PR is merged:
 2. In this repository's settings, the `nuget` environment has the maintainers as required
    reviewers and is limited to the `main` branch.
 3. Drop the not-on-NuGet notice from both READMEs in its own pull request (NuGet shows
-   `README.md` as the package's page).
+   `README.md` as the package's page and keeps it with each version). CI's "Pack and install"
+   fails on a release PR that still has it.
 4. Merge the release PR. release-please tags `v0.1.0` and the build job packs and checks the tag;
    approve the `nuget` environment, and the publish job pushes the package and its symbols.
 

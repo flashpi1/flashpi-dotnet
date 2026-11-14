@@ -151,8 +151,12 @@ jobs:
           Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}
 
           Review new operations or fields: they may need a method (tests/Flashpi.Tests/OperationsTests.cs lists every operation) or a change to the generator's tables (tools/Flashpi.Tools/OpenApi/Generator.cs)."
+          # A contract the SDK fails with stays a draft, so it cannot be merged by mistake.
+          draft=()
+          [ "$CHECKS" = success ] || draft=(--draft)
           if gh pr view "$BRANCH" --json state --jq .state 2>/dev/null | grep -q OPEN; then
             gh pr edit "$BRANCH" --body "$body"
+            if [ "$CHECKS" = success ]; then gh pr ready "$BRANCH"; else gh pr ready --undo "$BRANCH"; fi
           else
-            gh pr create --head "$BRANCH" --title "chore: sync the Flashpi API contract" --body "$body"
+            gh pr create --head "$BRANCH" --title "chore: sync the Flashpi API contract" --body "$body" "${draft[@]}"
           fi

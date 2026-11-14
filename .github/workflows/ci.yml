@@ -73,6 +73,12 @@ jobs:
       - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
         with:
           dotnet-version: '11.0.x'
+      # global.json keeps every other job on a 10.0 SDK; this one rolls forward to .NET 11's.
+      - name: Use the .NET 11 SDK
+        run: |
+          jq '.sdk.rollForward = "latestMajor"' global.json > global.json.tmp
+          mv global.json.tmp global.json
+          dotnet --version
       # The net10.0 build of the SDK, on .NET 11 and with its SDK and analyzers.
       - run: dotnet test --project tests/Flashpi.Tests -p:TestTargetFrameworks=net11.0
 
@@ -107,8 +113,9 @@ jobs:
       - name: Install the package and use it on .NET Framework
         shell: bash
         run: |
+          version=$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' src/Flashpi/Flashpi.csproj)
           dotnet pack src/Flashpi -c Release -o dist
-          dotnet run --project tests/Flashpi.InstalledCheck -f net48 -p:FlashpiVersion=0.0.0
+          dotnet run --project tests/Flashpi.InstalledCheck -f net48 -p:FlashpiVersion="$version"
 
   package:
     name: Pack and install
@@ -130,6 +137,15 @@ jobs:
 
       - name: Check what NuGet would get
         run: dotnet run --project tools/Flashpi.Tools -- package check dist
+
+      # NuGet keeps a version's README forever: a release PR must not ship the notice.
+      - name: Check the READMEs are ready for the release
+        run: |
+          version=$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' src/Flashpi/Flashpi.csproj)
+          if [ "$version" != 0.0.0 ] && grep -qE 'Aún no está publicado en NuGet|Not published on NuGet yet' README.md README.en.md; then
+            echo "::error::Drop the not-on-NuGet notice from both READMEs before releasing ${version}"
+            exit 1
+          fi
 
       - name: Install the package in a clean project and use it
         run: |
