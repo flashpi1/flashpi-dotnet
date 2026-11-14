@@ -369,14 +369,14 @@ internal sealed class Engine
         using var request = BuildRequest(spec, call);
         using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         deadline.CancelAfter(call.Timeout);
+        HttpResponseMessage? response = null;
         try
         {
-            HttpResponseMessage response;
             try
             {
                 response = await _http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, deadline.Token).ConfigureAwait(false);
             }
-            catch (Exception error) when (IsTransferFailure(error))
+            catch (Exception error) when (IsTransferFailure(error, deadline))
             {
                 throw TransferFailure(spec, call, error, deadline, cancellationToken);
             }
@@ -384,11 +384,20 @@ internal sealed class Engine
             byte[] body;
             try
             {
-                using var abort = deadline.Token.Register(static state => ((HttpResponseMessage)state!).Dispose(), response);
-                body = await ReadBodyAsync(response.Content, deadline.Token).ConfigureAwait(false);
+                using (deadline.Token.Register(static state => ((HttpResponseMessage)state!).Dispose(), response))
+                {
+                    body = await ReadBodyAsync(response.Content, deadline.Token).ConfigureAwait(false);
+                }
+                // Disposing the registration waits for a callback that already started, so from here
+                // the answer is whole and not disposed, unless the deadline passed meanwhile.
+                if (deadline.IsCancellationRequested)
+                {
+                    throw new OperationCanceledException(deadline.Token);
+                }
             }
-            catch (Exception error) when (IsTransferFailure(error))
+            catch (Exception error) when (IsTransferFailure(error, deadline) || error is InvalidOperationException)
             {
+                // Reading the body, an InvalidOperationException is Brotli's invalid data.
                 response.Dispose();
                 throw TransferFailure(spec, call, error, deadline, cancellationToken);
             }
@@ -417,8 +426,13 @@ internal sealed class Engine
         }
         finally
         {
-            // The answer keeps its request: never with the API key in it.
+            // The answer keeps its request: never with the API key in it, also when a handler of
+            // the caller's HttpClient sent a copy of it.
             request.Headers.Authorization = null;
+            if (response?.RequestMessage is { } sent && !ReferenceEquals(sent, request))
+            {
+                sent.Headers.Authorization = null;
+            }
         }
     }
 
@@ -441,8 +455,15 @@ internal sealed class Engine
         }
     }
 
-    private static bool IsTransferFailure(Exception error) =>
-        error is OperationCanceledException or HttpRequestException or IOException or ObjectDisposedException;
+    /// <summary>
+    /// Whether an exception of HttpClient means the attempt got no complete answer: a cancellation,
+    /// a network or protocol error, a body that does not decompress (InvalidDataException, which is
+    /// not an IOException), or the answer the deadline disposed. A client disposed by its owner is
+    /// not one: its ObjectDisposedException is thrown as it is, never retried.
+    /// </summary>
+    private static bool IsTransferFailure(Exception error, CancellationTokenSource deadline) =>
+        error is OperationCanceledException or HttpRequestException or IOException or InvalidDataException
+        || (error is ObjectDisposedException && deadline.IsCancellationRequested);
 
     /// <summary>
     /// The error of an attempt that got no complete answer. Cancelling through the caller's token
