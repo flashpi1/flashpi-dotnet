@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- The SDK against the real Flashpi API in test mode (see LiveTests.cs and CONTRIBUTING.md).
+       Needs FLASHPI_TEST_API_KEY and FLASHPI_DEMO_ISSUER_ID; without them every test is skipped.
+       It issues ONE test invoice on the shared demo issuer, so CI runs it on release PRs only. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>Flashpi.LiveTests</RootNamespace>
+    <NoWarn>$(NoWarn);xUnit1051;CA1707;CA2007;CA1515;CA1031;CA2016</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="xunit.v3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/Flashpi/Flashpi.csproj" />
+  </ItemGroup>
+
+</Project>

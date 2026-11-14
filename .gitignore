@@ -1,14 +1,14 @@
 # Build output
 bin/
 obj/
-artifacts/
-dist/
+/artifacts/
+/dist/
 *.nupkg
 *.snupkg
 
 # Test output
 TestResults/
-coverage/
+/coverage/
 *.coverage
 coverage.*.xml
 coverage.json

@@ -1,0 +1,25 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: ci
+    groups:
+      github-actions:
+        patterns: ['*']
+  # Directory.Packages.props. The netstandard2.0 build's dependencies are the lowest versions the
+  # package asks of its users, so they are raised by hand only.
+  - package-ecosystem: nuget
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: chore
+    ignore:
+      - dependency-name: System.Text.Json
+      - dependency-name: Microsoft.Bcl.AsyncInterfaces
+    groups:
+      test-dependencies:
+        patterns: ['*']

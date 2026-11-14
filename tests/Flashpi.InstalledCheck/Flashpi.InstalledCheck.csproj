@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Uses the package as a user installs it, from the .nupkg in dist/ (CI's "Pack and install"):
+       dotnet run -p:FlashpiVersion=0.1.0 -f net10.0. net8.0 and net48 get the netstandard2.0
+       build. Not part of the solution. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>net10.0;net8.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">$(TargetFrameworks);net48</TargetFrameworks>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+    <RestoreSources>$(MSBuildThisFileDirectory)../../dist;https://api.nuget.org/v3/index.json</RestoreSources>
+    <!-- Its own packages folder, so a package rebuilt with the same version is never taken
+         from the global cache. -->
+    <RestorePackagesPath>$(MSBuildThisFileDirectory)obj/packages</RestorePackagesPath>
+    <NoWarn>$(NoWarn);CA2007</NoWarn>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Flashpi" Version="[$(FlashpiVersion)]" />
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" Condition="'$(TargetFramework)' == 'net48'" />
+  </ItemGroup>
+
+  <!-- HttpClient is in System.Net.Http, which .NET Framework projects reference by hand. -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
+
+</Project>

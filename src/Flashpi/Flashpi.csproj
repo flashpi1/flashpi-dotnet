@@ -6,7 +6,6 @@
     <TargetFrameworks>net10.0;netstandard2.0</TargetFrameworks>
     <RootNamespace>Flashpi</RootNamespace>
     <AssemblyName>Flashpi</AssemblyName>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Label="Package">
@@ -22,6 +21,10 @@
     <RepositoryType>git</RepositoryType>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <!-- NuGet shows the Spanish README, as npm and PyPI do; its links are absolute. -->
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <!-- The website's icon, at the 128 x 128 pixels NuGet asks for. -->
+    <PackageIcon>icon.png</PackageIcon>
     <PackageTags>flashpi;sri;ecuador;facturacion-electronica;e-invoicing;invoice;api;sdk</PackageTags>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -32,6 +35,13 @@
   <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0'">
     <IsAotCompatible>true</IsAotCompatible>
   </PropertyGroup>
+
+  <ItemGroup>
+    <!-- The tests are signed with the same key (Directory.Build.props). -->
+    <InternalsVisibleTo Include="Flashpi.Tests" Key="$(FlashpiPublicKey)" />
+    <None Include="../../README.md" Pack="true" PackagePath="/" Visible="false" />
+    <None Include="icon.png" Pack="true" PackagePath="/" />
+  </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" />
