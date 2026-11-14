@@ -8,6 +8,41 @@ unless an entry says otherwise. Entries marked as the owner's were taken with th
 owner; the others were chosen while porting, after the Python SDK where the owner had not decided,
 and are listed so they can be confirmed or changed before 1.0.
 
+## 2026-11-14: before 0.1.0
+
+### The owner's decisions
+
+- **Porting choices confirmed.** Everything under "Chosen while porting" of 2026-11-13 was
+  confirmed as proposed.
+- **Whole numbers.** The contract types ten counters as `number` although the API always sends
+  integers (`Document.sequential`, the `attemptCount` of `WebhookDelivery` and
+  `WebhookDeliveryDetail`, `WebhookDeliveryAttempt.number` and `durationMs`,
+  `WebhookEndpointVerification.attempts`, `AccountEmailSendingWindow.sent`, `hardBounces` and
+  `complaints`, and `ProblemDetails.status`). The generator makes them `int` through a table
+  (`IntegerMembers`), as the Go SDK does, and fails once one of them is no longer a `number`, so
+  its entry goes. flashpi-api should declare them `type: integer` (a separate task).
+- **Strong name.** Every assembly of the repository is signed with `Flashpi.snk` (public key token
+  `ef9aa817232f071d`), a 1024-bit key as `sn -k` makes, committed as Microsoft advises for
+  open-source libraries: signed .NET Framework apps can only load signed assemblies, and signing
+  later would break binary compatibility. The key is not a secret and never changes. `package
+  check` fails on a `Flashpi.dll` that is not fully signed with it; the tests reach the internals
+  through an `InternalsVisibleTo` with its public key (`FlashpiPublicKey` in
+  `Directory.Build.props`).
+- **Icon.** The package's icon is the website's (`icon-512.png` of the landing), at the 128 x 128
+  pixels NuGet recommends: `src/Flashpi/icon.png`.
+- **nuget.org.** The account is `flashpi`. Its trusted publishing policy "flashpi-dotnet release"
+  pushes new packages and versions whose ID matches `Flashpi`, from `release.yml` in the `nuget`
+  environment of `flashpi1/flashpi-dotnet`. Once 0.1.0 is published, the account asks nuget.org
+  to reserve the `Flashpi` ID prefix (`Flashpi` and `Flashpi.*` then show as verified, and only
+  that account can push them).
+
+### Also
+
+- **OpenAPI sync.** While its pull request is open, the daily sync puts a new contract on top of
+  its branch instead of force-pushing the branch from main, so what maintainers push there is
+  kept (the Go SDK's review found it), and it leaves a pull request that already has that
+  contract alone, since its models may come from a generator changed on the branch.
+
 ## 2026-11-13: the .NET SDK
 
 ### The owner's decisions
@@ -38,7 +73,7 @@ and are listed so they can be confirmed or changed before 1.0.
   release-please from 0.1.0; the live API test on the release PR only; the flashpi-bot GitHub App
   token for bot PRs; grouped Dependabot.
 
-### Chosen while porting (to confirm)
+### Chosen while porting (confirmed by the owner on 2026-11-14)
 
 - **Names.** The client is `FlashpiClient` with `FlashpiClientOptions` (a class named like its
   namespace makes `Flashpi.Flashpi`, which C# code avoids). The client, its options,
@@ -76,7 +111,7 @@ and are listed so they can be confirmed or changed before 1.0.
   (System.Text.Json cannot fill extension data through a constructor). The `ToString()` of
   `WebhookEndpointSecret` hides its secret (a table of secret members in the generator). `date-time` is `DateTimeOffset`; `date`,
   `uuid`, amounts and quantities stay strings (`DateOnly` is not in netstandard2.0); `integer` is
-  `int` (`long` for `int64`) and `number` is `double`.
+  `int` (`long` for `int64`) and `number` is `double` (but see the whole numbers of 2026-11-14).
 - **Enums.** Extensible `readonly struct`s: a value the SDK does not know yet still reads (and
   compares by its `Value`), with a static member per known value, `==`, ordinal ordering
   (`IComparable`), use as dictionary keys in JSON, and an implicit conversion from text
@@ -165,7 +200,7 @@ and are listed so they can be confirmed or changed before 1.0.
 - **Package.** The `.nupkg` holds the two builds with their XML documentation and `README.md`;
   the `.snupkg` their symbols; SourceLink points at the commit. `package check` fails on anything
   missing or extra and on other dependencies, and CI installs the package in a clean project
-  (`tests/Flashpi.InstalledCheck`) on net10.0, net8.0 and net48. No icon yet.
+  (`tests/Flashpi.InstalledCheck`) on net10.0, net8.0 and net48. No icon yet (see 2026-11-14).
 - **Releases.** release-please's `simple` type updates `version.txt`; `Flashpi.csproj` and
   `src/Flashpi/Internal/SdkVersion.cs` (the User-Agent `flashpi-dotnet/<version>`) are extra files.
   A build job, with a read-only token, no secret and no cache, packs the tag with the .NET SDK

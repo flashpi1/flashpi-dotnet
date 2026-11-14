@@ -61,6 +61,9 @@ dotnet test --project tests/Flashpi.Tests
 - The library has **no dependencies** on net10.0, and only System.Text.Json and
   Microsoft.Bcl.AsyncInterfaces on netstandard2.0. What netstandard2.0 lacks (`init`, `required`,
   nullable attributes) is in `src/Flashpi/Internal/Polyfills.cs`.
+- Every assembly is strong-named with `Flashpi.snk` (`Directory.Build.props`). The key is public on
+  purpose and must never change: a new key breaks every signed app that uses the package. An
+  `InternalsVisibleTo` needs `Key="$(FlashpiPublicKey)"`.
 - Every operation is declared once, as a `RequestSpec`, and sent by `Internal/Engine.cs`, which
   holds the retries, the idempotency, the recoveries and the errors.
 - Resource methods mirror the API: `CreateAsync`, `ListAsync`, `GetAsync`, `UpdateAsync`,
@@ -84,7 +87,8 @@ dotnet run --project tools/Flashpi.Tools -- openapi generate  # regenerate from 
 The `OpenAPI sync` workflow does this every day and opens a pull request when the contract
 changes. The generator fails on anything it does not know (a new union, a new list operation
 without a name for its query, ...): extend it, or its tables at the top of
-`tools/Flashpi.Tools/OpenApi/Generator.cs`. New operations need a method.
+`tools/Flashpi.Tools/OpenApi/Generator.cs`. New operations need a method. A contract that now
+types one of the whole numbers of `IntegerMembers` as `integer` fails it too: remove the entry.
 
 ## Commits and releases
 
@@ -134,7 +138,8 @@ Connect. Before the first release PR is merged:
 1. An owner creates the Flashpi account on nuget.org (with two-factor authentication) and, under
    **Trusted Publishing**, a policy: repository owner `flashpi1`, repository `flashpi-dotnet`,
    workflow `release.yml`, environment `nuget`. The account's name is the `user` of the
-   NuGet/login step in `release.yml` (`flashpi`).
+   NuGet/login step in `release.yml` (`flashpi`). Done on 2026-11-14 (policy "flashpi-dotnet
+   release", for the package ID `Flashpi`).
 2. In this repository's settings, the `nuget` environment has the maintainers as required
    reviewers and is limited to the `main` branch.
 3. Drop the not-on-NuGet notice from both READMEs in its own pull request (NuGet shows
@@ -142,6 +147,8 @@ Connect. Before the first release PR is merged:
    fails on a release PR that still has it.
 4. Merge the release PR. release-please tags `v0.1.0` and the build job packs and checks the tag;
    approve the `nuget` environment, and the publish job pushes the package and its symbols.
+5. Once 0.1.0 is on nuget.org, the `flashpi` account asks nuget.org to reserve the `Flashpi` ID
+   prefix.
 
 From then on, versions are published by the workflow only: do not create NuGet API keys for the
 package.
