@@ -4,6 +4,7 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Flashpi.Examples/Flashpi.Examples.csproj" />
+    <Project Path="tests/Flashpi.LiveTests/Flashpi.LiveTests.csproj" />
     <Project Path="tests/Flashpi.Tests/Flashpi.Tests.csproj" />
   </Folder>
   <Folder Name="/tools/">
