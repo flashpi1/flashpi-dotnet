@@ -130,6 +130,48 @@ public sealed class ReviewFixesTests
         Assert.Equal(new[] { DocumentStatus.Authorized, DocumentStatus.Failed, DocumentStatus.Rejected }, sorted);
     }
 
+    [Fact]
+    public void Compares_enums_with_null_without_throwing()
+    {
+        var status = DocumentStatus.Authorized;
+        Assert.False(status.Equals(null));
+        Assert.False(status == null);
+        Assert.True(status != null);
+        string? missing = null;
+        DocumentStatus converted = missing;
+        Assert.Equal(default, converted);
+        Language language = missing;
+        Assert.Equal("", language.Value);
+        Assert.Equal(default, Language.FromString(null));
+        var problem = ApiErrors.ParseProblem("{\"code\":\"x\"}")!;
+        Assert.False(problem.Code == null);
+    }
+
+    [Fact]
+    public async Task Sends_no_language_for_one_read_from_a_missing_setting()
+    {
+        var api = new FakeApi(Reply.Json(Samples.Document()));
+        string? missing = null;
+        using var test = new Harness(api, options => { options.Language = missing; return options; });
+        await test.Client.Documents.GetAsync(Samples.Id);
+        Assert.Null(api.Last.Header("Accept-Language"));
+    }
+
+    [Fact]
+    public void Reads_a_null_number_boolean_or_date_as_its_default()
+    {
+        var document = JsonSerializer.Deserialize(
+            "{\"id\":\"d1\",\"sequential\":null,\"createdAt\":null,\"voidedAt\":null}", Json.TypeInfo<Document>())!;
+        Assert.Equal(0, document.Sequential);
+        Assert.Equal(default, document.CreatedAt);
+        Assert.Null(document.VoidedAt);
+        var onboarding = JsonSerializer.Deserialize("{\"id\":\"o1\",\"rucNeedsConfirmation\":null}", Json.TypeInfo<IssuerOnboarding>())!;
+        Assert.False(onboarding.RucNeedsConfirmation);
+        var withholding = JsonSerializer.Deserialize("{\"count\":null}", Json.TypeInfo<WithholdingBananaBoxes>())!;
+        Assert.Equal(0, withholding.Count);
+        Assert.Equal("{\"count\":3}", JsonSerializer.Serialize(withholding with { Count = 3 }, Json.TypeInfo<WithholdingBananaBoxes>()));
+    }
+
     /// <summary>Content whose stream throws when read.</summary>
     private sealed class ThrowingContent(Exception error) : HttpContent
     {

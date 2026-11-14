@@ -116,4 +116,15 @@ public sealed class GeneratorTests
         });
         Assert.Contains("Table entries that match nothing in the document: eventsList", message);
     }
+
+    [Fact]
+    public void Fails_on_a_member_shared_by_name_with_other_values()
+    {
+        var message = Fails(document => Schemas(document)["Certificate"]!["properties"]!["environment"] = new JsonObject
+        {
+            ["type"] = "string",
+            ["enum"] = new JsonArray("staging"),
+        });
+        Assert.Contains("its values differ from those of FlashpiEnvironment, which every .environment shares", message);
+    }
 }
