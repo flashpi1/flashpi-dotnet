@@ -8,3 +8,5 @@
 openapi/openapi.json linguist-generated
 # Generated from that copy (`openapi generate`).
 src/Flashpi/Generated/Models.g.cs linguist-generated
+# The README examples, extracted from the READMEs (`readme generate`).
+tests/Flashpi.Examples/Readme/*.cs linguist-generated
