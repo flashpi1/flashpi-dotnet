@@ -24,6 +24,13 @@ internal abstract class ExtensibleEnumConverter<T> : JsonConverter<T>
     public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options) =>
         writer.WriteStringValue(value.ToString());
 
+    // As dictionary keys too (a dictionary of counts by status).
+    public override T ReadAsPropertyName(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) =>
+        Create(reader.GetString()!);
+
+    public override void WriteAsPropertyName(Utf8JsonWriter writer, T value, JsonSerializerOptions options) =>
+        writer.WritePropertyName(value.ToString()!);
+
     protected abstract T Create(string value);
 }
 

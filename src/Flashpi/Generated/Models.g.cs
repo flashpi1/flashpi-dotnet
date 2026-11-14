@@ -6,6 +6,7 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Flashpi.Internal;
@@ -56,7 +57,7 @@ public sealed partial record AccountEmailSending
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(AccountEmailSendingPauseReason.Converter))]
-public readonly partial struct AccountEmailSendingPauseReason : IEquatable<AccountEmailSendingPauseReason>
+public readonly partial struct AccountEmailSendingPauseReason : IEquatable<AccountEmailSendingPauseReason>, IComparable<AccountEmailSendingPauseReason>
 {
     private readonly string? _value;
 
@@ -92,6 +93,9 @@ public readonly partial struct AccountEmailSendingPauseReason : IEquatable<Accou
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is AccountEmailSendingPauseReason other && Equals(other);
 
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(AccountEmailSendingPauseReason other) => string.CompareOrdinal(Value, other.Value);
+
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
 
@@ -110,7 +114,7 @@ public readonly partial struct AccountEmailSendingPauseReason : IEquatable<Accou
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(AccountEmailSendingStatus.Converter))]
-public readonly partial struct AccountEmailSendingStatus : IEquatable<AccountEmailSendingStatus>
+public readonly partial struct AccountEmailSendingStatus : IEquatable<AccountEmailSendingStatus>, IComparable<AccountEmailSendingStatus>
 {
     private readonly string? _value;
 
@@ -142,6 +146,9 @@ public readonly partial struct AccountEmailSendingStatus : IEquatable<AccountEma
 
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is AccountEmailSendingStatus other && Equals(other);
+
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(AccountEmailSendingStatus other) => string.CompareOrdinal(Value, other.Value);
 
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
@@ -215,7 +222,7 @@ public sealed partial record ApiStatus
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(ApiStatusKind.Converter))]
-public readonly partial struct ApiStatusKind : IEquatable<ApiStatusKind>
+public readonly partial struct ApiStatusKind : IEquatable<ApiStatusKind>, IComparable<ApiStatusKind>
 {
     private readonly string? _value;
 
@@ -244,6 +251,9 @@ public readonly partial struct ApiStatusKind : IEquatable<ApiStatusKind>
 
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is ApiStatusKind other && Equals(other);
+
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(ApiStatusKind other) => string.CompareOrdinal(Value, other.Value);
 
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
@@ -442,7 +452,7 @@ public sealed partial record CertificateRevocation
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(CertificateRevocationBlockedReason.Converter))]
-public readonly partial struct CertificateRevocationBlockedReason : IEquatable<CertificateRevocationBlockedReason>
+public readonly partial struct CertificateRevocationBlockedReason : IEquatable<CertificateRevocationBlockedReason>, IComparable<CertificateRevocationBlockedReason>
 {
     private readonly string? _value;
 
@@ -475,6 +485,9 @@ public readonly partial struct CertificateRevocationBlockedReason : IEquatable<C
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is CertificateRevocationBlockedReason other && Equals(other);
 
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(CertificateRevocationBlockedReason other) => string.CompareOrdinal(Value, other.Value);
+
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
 
@@ -493,7 +506,7 @@ public readonly partial struct CertificateRevocationBlockedReason : IEquatable<C
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(CertificateRevocationStatus.Converter))]
-public readonly partial struct CertificateRevocationStatus : IEquatable<CertificateRevocationStatus>
+public readonly partial struct CertificateRevocationStatus : IEquatable<CertificateRevocationStatus>, IComparable<CertificateRevocationStatus>
 {
     private readonly string? _value;
 
@@ -532,6 +545,9 @@ public readonly partial struct CertificateRevocationStatus : IEquatable<Certific
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is CertificateRevocationStatus other && Equals(other);
 
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(CertificateRevocationStatus other) => string.CompareOrdinal(Value, other.Value);
+
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
 
@@ -550,7 +566,7 @@ public readonly partial struct CertificateRevocationStatus : IEquatable<Certific
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(CertificateStatus.Converter))]
-public readonly partial struct CertificateStatus : IEquatable<CertificateStatus>
+public readonly partial struct CertificateStatus : IEquatable<CertificateStatus>, IComparable<CertificateStatus>
 {
     private readonly string? _value;
 
@@ -585,6 +601,9 @@ public readonly partial struct CertificateStatus : IEquatable<CertificateStatus>
 
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is CertificateStatus other && Equals(other);
+
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(CertificateStatus other) => string.CompareOrdinal(Value, other.Value);
 
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
@@ -1455,7 +1474,7 @@ public sealed partial record DocumentEmailDelivery
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(DocumentEmailDeliveryStatus.Converter))]
-public readonly partial struct DocumentEmailDeliveryStatus : IEquatable<DocumentEmailDeliveryStatus>
+public readonly partial struct DocumentEmailDeliveryStatus : IEquatable<DocumentEmailDeliveryStatus>, IComparable<DocumentEmailDeliveryStatus>
 {
     private readonly string? _value;
 
@@ -1500,6 +1519,9 @@ public readonly partial struct DocumentEmailDeliveryStatus : IEquatable<Document
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is DocumentEmailDeliveryStatus other && Equals(other);
 
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(DocumentEmailDeliveryStatus other) => string.CompareOrdinal(Value, other.Value);
+
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
 
@@ -1520,7 +1542,7 @@ public readonly partial struct DocumentEmailDeliveryStatus : IEquatable<Document
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(DocumentEmailStatus.Converter))]
-public readonly partial struct DocumentEmailStatus : IEquatable<DocumentEmailStatus>
+public readonly partial struct DocumentEmailStatus : IEquatable<DocumentEmailStatus>, IComparable<DocumentEmailStatus>
 {
     private readonly string? _value;
 
@@ -1571,6 +1593,9 @@ public readonly partial struct DocumentEmailStatus : IEquatable<DocumentEmailSta
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is DocumentEmailStatus other && Equals(other);
 
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(DocumentEmailStatus other) => string.CompareOrdinal(Value, other.Value);
+
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
 
@@ -1614,7 +1639,7 @@ public sealed partial record DocumentEmailWarning
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(DocumentEmailWarningCode.Converter))]
-public readonly partial struct DocumentEmailWarningCode : IEquatable<DocumentEmailWarningCode>
+public readonly partial struct DocumentEmailWarningCode : IEquatable<DocumentEmailWarningCode>, IComparable<DocumentEmailWarningCode>
 {
     private readonly string? _value;
 
@@ -1643,6 +1668,9 @@ public readonly partial struct DocumentEmailWarningCode : IEquatable<DocumentEma
 
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is DocumentEmailWarningCode other && Equals(other);
+
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(DocumentEmailWarningCode other) => string.CompareOrdinal(Value, other.Value);
 
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
@@ -1687,7 +1715,7 @@ public sealed partial record DocumentFailure
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(DocumentFailureCode.Converter))]
-public readonly partial struct DocumentFailureCode : IEquatable<DocumentFailureCode>
+public readonly partial struct DocumentFailureCode : IEquatable<DocumentFailureCode>, IComparable<DocumentFailureCode>
 {
     private readonly string? _value;
 
@@ -1752,6 +1780,9 @@ public readonly partial struct DocumentFailureCode : IEquatable<DocumentFailureC
 
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is DocumentFailureCode other && Equals(other);
+
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(DocumentFailureCode other) => string.CompareOrdinal(Value, other.Value);
 
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
@@ -1970,7 +2001,7 @@ public sealed partial record DocumentPayment
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(DocumentPaymentTermUnit.Converter))]
-public readonly partial struct DocumentPaymentTermUnit : IEquatable<DocumentPaymentTermUnit>
+public readonly partial struct DocumentPaymentTermUnit : IEquatable<DocumentPaymentTermUnit>, IComparable<DocumentPaymentTermUnit>
 {
     private readonly string? _value;
 
@@ -2002,6 +2033,9 @@ public readonly partial struct DocumentPaymentTermUnit : IEquatable<DocumentPaym
 
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is DocumentPaymentTermUnit other && Equals(other);
+
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(DocumentPaymentTermUnit other) => string.CompareOrdinal(Value, other.Value);
 
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
@@ -2038,7 +2072,7 @@ public sealed partial record DocumentRide
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(DocumentRideTemplate.Converter))]
-public readonly partial struct DocumentRideTemplate : IEquatable<DocumentRideTemplate>
+public readonly partial struct DocumentRideTemplate : IEquatable<DocumentRideTemplate>, IComparable<DocumentRideTemplate>
 {
     private readonly string? _value;
 
@@ -2073,6 +2107,9 @@ public readonly partial struct DocumentRideTemplate : IEquatable<DocumentRideTem
 
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is DocumentRideTemplate other && Equals(other);
+
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(DocumentRideTemplate other) => string.CompareOrdinal(Value, other.Value);
 
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
@@ -2109,7 +2146,7 @@ public sealed partial record DocumentSriMessage
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(DocumentSriMessageSeverity.Converter))]
-public readonly partial struct DocumentSriMessageSeverity : IEquatable<DocumentSriMessageSeverity>
+public readonly partial struct DocumentSriMessageSeverity : IEquatable<DocumentSriMessageSeverity>, IComparable<DocumentSriMessageSeverity>
 {
     private readonly string? _value;
 
@@ -2142,6 +2179,9 @@ public readonly partial struct DocumentSriMessageSeverity : IEquatable<DocumentS
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is DocumentSriMessageSeverity other && Equals(other);
 
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(DocumentSriMessageSeverity other) => string.CompareOrdinal(Value, other.Value);
+
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
 
@@ -2160,7 +2200,7 @@ public readonly partial struct DocumentSriMessageSeverity : IEquatable<DocumentS
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(DocumentStatus.Converter))]
-public readonly partial struct DocumentStatus : IEquatable<DocumentStatus>
+public readonly partial struct DocumentStatus : IEquatable<DocumentStatus>, IComparable<DocumentStatus>
 {
     private readonly string? _value;
 
@@ -2204,6 +2244,9 @@ public readonly partial struct DocumentStatus : IEquatable<DocumentStatus>
 
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is DocumentStatus other && Equals(other);
+
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(DocumentStatus other) => string.CompareOrdinal(Value, other.Value);
 
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
@@ -2308,7 +2351,7 @@ public sealed partial record DocumentTotals
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(DocumentType.Converter))]
-public readonly partial struct DocumentType : IEquatable<DocumentType>
+public readonly partial struct DocumentType : IEquatable<DocumentType>, IComparable<DocumentType>
 {
     private readonly string? _value;
 
@@ -2352,6 +2395,9 @@ public readonly partial struct DocumentType : IEquatable<DocumentType>
 
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is DocumentType other && Equals(other);
+
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(DocumentType other) => string.CompareOrdinal(Value, other.Value);
 
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
@@ -2433,7 +2479,7 @@ public sealed partial record EmissionPointListParams
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(ErrorCode.Converter))]
-public readonly partial struct ErrorCode : IEquatable<ErrorCode>
+public readonly partial struct ErrorCode : IEquatable<ErrorCode>, IComparable<ErrorCode>
 {
     private readonly string? _value;
 
@@ -2615,6 +2661,9 @@ public readonly partial struct ErrorCode : IEquatable<ErrorCode>
 
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is ErrorCode other && Equals(other);
+
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(ErrorCode other) => string.CompareOrdinal(Value, other.Value);
 
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
@@ -2814,7 +2863,7 @@ public sealed partial record EventThin : WebhookEvent
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(EventType.Converter))]
-public readonly partial struct EventType : IEquatable<EventType>
+public readonly partial struct EventType : IEquatable<EventType>, IComparable<EventType>
 {
     private readonly string? _value;
 
@@ -2925,6 +2974,9 @@ public readonly partial struct EventType : IEquatable<EventType>
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is EventType other && Equals(other);
 
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(EventType other) => string.CompareOrdinal(Value, other.Value);
+
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
 
@@ -2964,7 +3016,7 @@ public sealed partial record FieldError
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(FieldErrorCode.Converter))]
-public readonly partial struct FieldErrorCode : IEquatable<FieldErrorCode>
+public readonly partial struct FieldErrorCode : IEquatable<FieldErrorCode>, IComparable<FieldErrorCode>
 {
     private readonly string? _value;
 
@@ -3087,6 +3139,9 @@ public readonly partial struct FieldErrorCode : IEquatable<FieldErrorCode>
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is FieldErrorCode other && Equals(other);
 
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(FieldErrorCode other) => string.CompareOrdinal(Value, other.Value);
+
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
 
@@ -3106,7 +3161,7 @@ public readonly partial struct FieldErrorCode : IEquatable<FieldErrorCode>
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(FlashpiEnvironment.Converter))]
-public readonly partial struct FlashpiEnvironment : IEquatable<FlashpiEnvironment>
+public readonly partial struct FlashpiEnvironment : IEquatable<FlashpiEnvironment>, IComparable<FlashpiEnvironment>
 {
     private readonly string? _value;
 
@@ -3139,6 +3194,9 @@ public readonly partial struct FlashpiEnvironment : IEquatable<FlashpiEnvironmen
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is FlashpiEnvironment other && Equals(other);
 
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(FlashpiEnvironment other) => string.CompareOrdinal(Value, other.Value);
+
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
 
@@ -3157,7 +3215,7 @@ public readonly partial struct FlashpiEnvironment : IEquatable<FlashpiEnvironmen
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(IdType.Converter))]
-public readonly partial struct IdType : IEquatable<IdType>
+public readonly partial struct IdType : IEquatable<IdType>, IComparable<IdType>
 {
     private readonly string? _value;
 
@@ -3198,6 +3256,9 @@ public readonly partial struct IdType : IEquatable<IdType>
 
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is IdType other && Equals(other);
+
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(IdType other) => string.CompareOrdinal(Value, other.Value);
 
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
@@ -3509,7 +3570,7 @@ public sealed partial record IssuerOnboardingIdentification
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(IssuerOnboardingIdentificationRucSource.Converter))]
-public readonly partial struct IssuerOnboardingIdentificationRucSource : IEquatable<IssuerOnboardingIdentificationRucSource>
+public readonly partial struct IssuerOnboardingIdentificationRucSource : IEquatable<IssuerOnboardingIdentificationRucSource>, IComparable<IssuerOnboardingIdentificationRucSource>
 {
     private readonly string? _value;
 
@@ -3541,6 +3602,9 @@ public readonly partial struct IssuerOnboardingIdentificationRucSource : IEquata
 
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is IssuerOnboardingIdentificationRucSource other && Equals(other);
+
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(IssuerOnboardingIdentificationRucSource other) => string.CompareOrdinal(Value, other.Value);
 
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
@@ -3628,7 +3692,7 @@ public sealed partial record IssuerOnboardingPrefillTaxProfile
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(IssuerOnboardingPrefillTaxProfileRimpeRegime.Converter))]
-public readonly partial struct IssuerOnboardingPrefillTaxProfileRimpeRegime : IEquatable<IssuerOnboardingPrefillTaxProfileRimpeRegime>
+public readonly partial struct IssuerOnboardingPrefillTaxProfileRimpeRegime : IEquatable<IssuerOnboardingPrefillTaxProfileRimpeRegime>, IComparable<IssuerOnboardingPrefillTaxProfileRimpeRegime>
 {
     private readonly string? _value;
 
@@ -3663,6 +3727,9 @@ public readonly partial struct IssuerOnboardingPrefillTaxProfileRimpeRegime : IE
 
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is IssuerOnboardingPrefillTaxProfileRimpeRegime other && Equals(other);
+
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(IssuerOnboardingPrefillTaxProfileRimpeRegime other) => string.CompareOrdinal(Value, other.Value);
 
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
@@ -3773,7 +3840,7 @@ public sealed partial record IssuerOnboardingSriProfile
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(IssuerOnboardingSriProfileRimpeRegime.Converter))]
-public readonly partial struct IssuerOnboardingSriProfileRimpeRegime : IEquatable<IssuerOnboardingSriProfileRimpeRegime>
+public readonly partial struct IssuerOnboardingSriProfileRimpeRegime : IEquatable<IssuerOnboardingSriProfileRimpeRegime>, IComparable<IssuerOnboardingSriProfileRimpeRegime>
 {
     private readonly string? _value;
 
@@ -3812,6 +3879,9 @@ public readonly partial struct IssuerOnboardingSriProfileRimpeRegime : IEquatabl
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is IssuerOnboardingSriProfileRimpeRegime other && Equals(other);
 
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(IssuerOnboardingSriProfileRimpeRegime other) => string.CompareOrdinal(Value, other.Value);
+
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
 
@@ -3830,7 +3900,7 @@ public readonly partial struct IssuerOnboardingSriProfileRimpeRegime : IEquatabl
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(IssuerOnboardingSriStatus.Converter))]
-public readonly partial struct IssuerOnboardingSriStatus : IEquatable<IssuerOnboardingSriStatus>
+public readonly partial struct IssuerOnboardingSriStatus : IEquatable<IssuerOnboardingSriStatus>, IComparable<IssuerOnboardingSriStatus>
 {
     private readonly string? _value;
 
@@ -3869,6 +3939,9 @@ public readonly partial struct IssuerOnboardingSriStatus : IEquatable<IssuerOnbo
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is IssuerOnboardingSriStatus other && Equals(other);
 
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(IssuerOnboardingSriStatus other) => string.CompareOrdinal(Value, other.Value);
+
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
 
@@ -3887,7 +3960,7 @@ public readonly partial struct IssuerOnboardingSriStatus : IEquatable<IssuerOnbo
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(IssuerOnboardingSriWarningsItem.Converter))]
-public readonly partial struct IssuerOnboardingSriWarningsItem : IEquatable<IssuerOnboardingSriWarningsItem>
+public readonly partial struct IssuerOnboardingSriWarningsItem : IEquatable<IssuerOnboardingSriWarningsItem>, IComparable<IssuerOnboardingSriWarningsItem>
 {
     private readonly string? _value;
 
@@ -3926,6 +3999,9 @@ public readonly partial struct IssuerOnboardingSriWarningsItem : IEquatable<Issu
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is IssuerOnboardingSriWarningsItem other && Equals(other);
 
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(IssuerOnboardingSriWarningsItem other) => string.CompareOrdinal(Value, other.Value);
+
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
 
@@ -3944,7 +4020,7 @@ public readonly partial struct IssuerOnboardingSriWarningsItem : IEquatable<Issu
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(IssuerOnboardingStatus.Converter))]
-public readonly partial struct IssuerOnboardingStatus : IEquatable<IssuerOnboardingStatus>
+public readonly partial struct IssuerOnboardingStatus : IEquatable<IssuerOnboardingStatus>, IComparable<IssuerOnboardingStatus>
 {
     private readonly string? _value;
 
@@ -3985,6 +4061,9 @@ public readonly partial struct IssuerOnboardingStatus : IEquatable<IssuerOnboard
 
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is IssuerOnboardingStatus other && Equals(other);
+
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(IssuerOnboardingStatus other) => string.CompareOrdinal(Value, other.Value);
 
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
@@ -4247,7 +4326,7 @@ public sealed partial record ModifiedDocument
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(ModifiedDocumentType.Converter))]
-public readonly partial struct ModifiedDocumentType : IEquatable<ModifiedDocumentType>
+public readonly partial struct ModifiedDocumentType : IEquatable<ModifiedDocumentType>, IComparable<ModifiedDocumentType>
 {
     private readonly string? _value;
 
@@ -4276,6 +4355,9 @@ public readonly partial struct ModifiedDocumentType : IEquatable<ModifiedDocumen
 
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is ModifiedDocumentType other && Equals(other);
+
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(ModifiedDocumentType other) => string.CompareOrdinal(Value, other.Value);
 
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
@@ -4311,7 +4393,7 @@ public sealed partial record Pagination
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(PayloadMode.Converter))]
-public readonly partial struct PayloadMode : IEquatable<PayloadMode>
+public readonly partial struct PayloadMode : IEquatable<PayloadMode>, IComparable<PayloadMode>
 {
     private readonly string? _value;
 
@@ -4344,6 +4426,9 @@ public readonly partial struct PayloadMode : IEquatable<PayloadMode>
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is PayloadMode other && Equals(other);
 
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(PayloadMode other) => string.CompareOrdinal(Value, other.Value);
+
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
 
@@ -4362,7 +4447,7 @@ public readonly partial struct PayloadMode : IEquatable<PayloadMode>
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(PaymentMethod.Converter))]
-public readonly partial struct PaymentMethod : IEquatable<PaymentMethod>
+public readonly partial struct PaymentMethod : IEquatable<PaymentMethod>, IComparable<PaymentMethod>
 {
     private readonly string? _value;
 
@@ -4412,6 +4497,9 @@ public readonly partial struct PaymentMethod : IEquatable<PaymentMethod>
 
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is PaymentMethod other && Equals(other);
+
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(PaymentMethod other) => string.CompareOrdinal(Value, other.Value);
 
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
@@ -4527,7 +4615,7 @@ public sealed partial record ProblemDetails
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(RideStatus.Converter))]
-public readonly partial struct RideStatus : IEquatable<RideStatus>
+public readonly partial struct RideStatus : IEquatable<RideStatus>, IComparable<RideStatus>
 {
     private readonly string? _value;
 
@@ -4563,6 +4651,9 @@ public readonly partial struct RideStatus : IEquatable<RideStatus>
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is RideStatus other && Equals(other);
 
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(RideStatus other) => string.CompareOrdinal(Value, other.Value);
+
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
 
@@ -4582,7 +4673,7 @@ public readonly partial struct RideStatus : IEquatable<RideStatus>
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(RimpeRegime.Converter))]
-public readonly partial struct RimpeRegime : IEquatable<RimpeRegime>
+public readonly partial struct RimpeRegime : IEquatable<RimpeRegime>, IComparable<RimpeRegime>
 {
     private readonly string? _value;
 
@@ -4614,6 +4705,9 @@ public readonly partial struct RimpeRegime : IEquatable<RimpeRegime>
 
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is RimpeRegime other && Equals(other);
+
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(RimpeRegime other) => string.CompareOrdinal(Value, other.Value);
 
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
@@ -4713,7 +4807,7 @@ public sealed partial record SupportingDocument
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(SupportingDocumentPaymentResidence.Converter))]
-public readonly partial struct SupportingDocumentPaymentResidence : IEquatable<SupportingDocumentPaymentResidence>
+public readonly partial struct SupportingDocumentPaymentResidence : IEquatable<SupportingDocumentPaymentResidence>, IComparable<SupportingDocumentPaymentResidence>
 {
     private readonly string? _value;
 
@@ -4745,6 +4839,9 @@ public readonly partial struct SupportingDocumentPaymentResidence : IEquatable<S
 
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is SupportingDocumentPaymentResidence other && Equals(other);
+
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(SupportingDocumentPaymentResidence other) => string.CompareOrdinal(Value, other.Value);
 
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
@@ -4785,7 +4882,7 @@ public sealed partial record SupportingDocumentTax
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(SupportingDocumentTaxRate.Converter))]
-public readonly partial struct SupportingDocumentTaxRate : IEquatable<SupportingDocumentTaxRate>
+public readonly partial struct SupportingDocumentTaxRate : IEquatable<SupportingDocumentTaxRate>, IComparable<SupportingDocumentTaxRate>
 {
     private readonly string? _value;
 
@@ -4839,6 +4936,9 @@ public readonly partial struct SupportingDocumentTaxRate : IEquatable<Supporting
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is SupportingDocumentTaxRate other && Equals(other);
 
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(SupportingDocumentTaxRate other) => string.CompareOrdinal(Value, other.Value);
+
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
 
@@ -4857,7 +4957,7 @@ public readonly partial struct SupportingDocumentTaxRate : IEquatable<Supporting
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(SupportingDocumentTaxType.Converter))]
-public readonly partial struct SupportingDocumentTaxType : IEquatable<SupportingDocumentTaxType>
+public readonly partial struct SupportingDocumentTaxType : IEquatable<SupportingDocumentTaxType>, IComparable<SupportingDocumentTaxType>
 {
     private readonly string? _value;
 
@@ -4887,6 +4987,9 @@ public readonly partial struct SupportingDocumentTaxType : IEquatable<Supporting
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is SupportingDocumentTaxType other && Equals(other);
 
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(SupportingDocumentTaxType other) => string.CompareOrdinal(Value, other.Value);
+
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
 
@@ -4905,7 +5008,7 @@ public readonly partial struct SupportingDocumentTaxType : IEquatable<Supporting
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(TaxType.Converter))]
-public readonly partial struct TaxType : IEquatable<TaxType>
+public readonly partial struct TaxType : IEquatable<TaxType>, IComparable<TaxType>
 {
     private readonly string? _value;
 
@@ -4937,6 +5040,9 @@ public readonly partial struct TaxType : IEquatable<TaxType>
 
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is TaxType other && Equals(other);
+
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(TaxType other) => string.CompareOrdinal(Value, other.Value);
 
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
@@ -5307,7 +5413,7 @@ public sealed partial record WebhookDeliveryAttempt
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(WebhookDeliveryAttemptTrigger.Converter))]
-public readonly partial struct WebhookDeliveryAttemptTrigger : IEquatable<WebhookDeliveryAttemptTrigger>
+public readonly partial struct WebhookDeliveryAttemptTrigger : IEquatable<WebhookDeliveryAttemptTrigger>, IComparable<WebhookDeliveryAttemptTrigger>
 {
     private readonly string? _value;
 
@@ -5339,6 +5445,9 @@ public readonly partial struct WebhookDeliveryAttemptTrigger : IEquatable<Webhoo
 
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is WebhookDeliveryAttemptTrigger other && Equals(other);
+
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(WebhookDeliveryAttemptTrigger other) => string.CompareOrdinal(Value, other.Value);
 
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
@@ -5477,7 +5586,7 @@ public sealed partial record WebhookDeliveryListParams
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(WebhookDeliveryStatus.Converter))]
-public readonly partial struct WebhookDeliveryStatus : IEquatable<WebhookDeliveryStatus>
+public readonly partial struct WebhookDeliveryStatus : IEquatable<WebhookDeliveryStatus>, IComparable<WebhookDeliveryStatus>
 {
     private readonly string? _value;
 
@@ -5512,6 +5621,9 @@ public readonly partial struct WebhookDeliveryStatus : IEquatable<WebhookDeliver
 
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is WebhookDeliveryStatus other && Equals(other);
+
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(WebhookDeliveryStatus other) => string.CompareOrdinal(Value, other.Value);
 
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
@@ -5640,6 +5752,13 @@ public sealed partial record WebhookEndpointSecret
     /// <summary>After a rotation: until when the previous secret also signs.</summary>
     [JsonPropertyName("previousSecretExpiresAt")]
     public required DateTimeOffset? PreviousSecretExpiresAt { get; init; }
+
+    private bool PrintMembers(StringBuilder builder)
+    {
+        builder.Append("Secret = ").Append("<hidden>");
+        builder.Append(", PreviousSecretExpiresAt = ").Append((object?)PreviousSecretExpiresAt);
+        return true;
+    }
 }
 
 /// <summary>
@@ -5649,7 +5768,7 @@ public sealed partial record WebhookEndpointSecret
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(WebhookEndpointStatus.Converter))]
-public readonly partial struct WebhookEndpointStatus : IEquatable<WebhookEndpointStatus>
+public readonly partial struct WebhookEndpointStatus : IEquatable<WebhookEndpointStatus>, IComparable<WebhookEndpointStatus>
 {
     private readonly string? _value;
 
@@ -5684,6 +5803,9 @@ public readonly partial struct WebhookEndpointStatus : IEquatable<WebhookEndpoin
 
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is WebhookEndpointStatus other && Equals(other);
+
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(WebhookEndpointStatus other) => string.CompareOrdinal(Value, other.Value);
 
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
@@ -5802,7 +5924,7 @@ public sealed partial record WithheldSubject
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(WithheldSubjectSubjectType.Converter))]
-public readonly partial struct WithheldSubjectSubjectType : IEquatable<WithheldSubjectSubjectType>
+public readonly partial struct WithheldSubjectSubjectType : IEquatable<WithheldSubjectSubjectType>, IComparable<WithheldSubjectSubjectType>
 {
     private readonly string? _value;
 
@@ -5834,6 +5956,9 @@ public readonly partial struct WithheldSubjectSubjectType : IEquatable<WithheldS
 
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is WithheldSubjectSubjectType other && Equals(other);
+
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(WithheldSubjectSubjectType other) => string.CompareOrdinal(Value, other.Value);
 
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
@@ -5958,7 +6083,7 @@ public sealed partial record WithholdingForeignPayment
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(WithholdingForeignPaymentRegime.Converter))]
-public readonly partial struct WithholdingForeignPaymentRegime : IEquatable<WithholdingForeignPaymentRegime>
+public readonly partial struct WithholdingForeignPaymentRegime : IEquatable<WithholdingForeignPaymentRegime>, IComparable<WithholdingForeignPaymentRegime>
 {
     private readonly string? _value;
 
@@ -5994,6 +6119,9 @@ public readonly partial struct WithholdingForeignPaymentRegime : IEquatable<With
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is WithholdingForeignPaymentRegime other && Equals(other);
 
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(WithholdingForeignPaymentRegime other) => string.CompareOrdinal(Value, other.Value);
+
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
 
@@ -6025,7 +6153,7 @@ public sealed partial record WithholdingPayment
 /// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 [JsonConverter(typeof(WithholdingTax.Converter))]
-public readonly partial struct WithholdingTax : IEquatable<WithholdingTax>
+public readonly partial struct WithholdingTax : IEquatable<WithholdingTax>, IComparable<WithholdingTax>
 {
     private readonly string? _value;
 
@@ -6060,6 +6188,9 @@ public readonly partial struct WithholdingTax : IEquatable<WithholdingTax>
 
     /// <summary>Whether the object is the same value.</summary>
     public override bool Equals(object? obj) => obj is WithholdingTax other && Equals(other);
+
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(WithholdingTax other) => string.CompareOrdinal(Value, other.Value);
 
     /// <summary>A hash code of the value.</summary>
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);

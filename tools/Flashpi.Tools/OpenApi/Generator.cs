@@ -119,6 +119,9 @@ internal sealed partial class Generator
         ["eventsList"] = "EventListParams",
     };
 
+    /// <summary>Members that hold a secret: the record's <c>ToString()</c> hides them.</summary>
+    private static readonly HashSet<string> SecretMembers = ["WebhookEndpointSecret.secret"];
+
     /// <summary>C# names of enum values that have no letters or digits.</summary>
     private static readonly Dictionary<string, string> MemberNames = new(StringComparer.Ordinal)
     {
@@ -173,6 +176,8 @@ internal sealed partial class Generator
     private readonly Dictionary<string, TypeModel> _types = new(StringComparer.Ordinal);
     private readonly Dictionary<string, string> _bases = new(StringComparer.Ordinal);
     private readonly HashSet<string> _requestSchemas = new(StringComparer.Ordinal);
+    private readonly HashSet<string> _usedPlaces = new(StringComparer.Ordinal);
+    private readonly HashSet<string> _usedSecrets = new(StringComparer.Ordinal);
 
     public Generator(string contract)
     {
@@ -197,12 +202,36 @@ internal sealed partial class Generator
         }
         DefineQueries();
         CheckWebhookEventMembers();
+        CheckTablesAreUsed();
         return Emit();
+    }
+
+    /// <summary>Every entry of the tables names something of the document: a stale one fails.</summary>
+    private void CheckTablesAreUsed()
+    {
+        var stale = SchemaNames.Keys.Where(name => !_schemas.ContainsKey(name))
+            .Concat(QueryNames.Where(entry => !_types.ContainsKey(entry.Value)).Select(entry => entry.Key))
+            .Concat(EnumNames.Where(entry => !entry.Key.StartsWith('*') && !_usedPlaces.Contains(entry.Key)).Select(entry => entry.Key))
+            .Concat(SecretMembers.Where(member => !_usedSecrets.Contains(member)))
+            .ToList();
+        if (stale.Count > 0)
+        {
+            throw new GenerationException($"Table entries that match nothing in the document: {string.Join(", ", stale)}");
+        }
     }
 
     // Names.
 
-    private static string TypeName(string schema) => SchemaNames.GetValueOrDefault(schema, schema);
+    private static string TypeName(string schema)
+    {
+        var name = SchemaNames.GetValueOrDefault(schema, schema);
+        // A schema name becomes C# source: only a plain identifier is accepted.
+        if (!JsonNamePattern().IsMatch(name) || !char.IsAsciiLetterUpper(name[0]))
+        {
+            throw new GenerationException($"The schema name {schema} is not a PascalCase C# identifier");
+        }
+        return name;
+    }
 
     private static string UpperFirst(string value) =>
         value.Length == 0 ? value : char.ToUpperInvariant(value[0]) + value[1..];
@@ -244,6 +273,10 @@ internal sealed partial class Generator
     {
         foreach (var (_, item) in AsObject(_document["paths"], "paths"))
         {
+            if (AsObject(item, "path")["parameters"] is not null)
+            {
+                throw new GenerationException("Parameters declared for a whole path are not supported: declare them on each operation");
+            }
             foreach (var (method, operation) in AsObject(item, "path"))
             {
                 if (operation is JsonObject body && body["requestBody"] is JsonNode requestBody && IsMethod(method))
@@ -408,8 +441,14 @@ internal sealed partial class Generator
                 continue;
             }
             var tracked = request && !isRequired && type.Nullable;
+            var secret = SecretMembers.Contains($"{placeKey}.{key}");
+            if (secret)
+            {
+                _usedSecrets.Add($"{placeKey}.{key}");
+                record.HasSecret = true;
+            }
             var doc = Describe(member);
-            record.Properties.Add(new PropertyModel(key, propertyName, type, isRequired, tracked, doc.Length > 0 ? doc : ReferencedDoc(member)));
+            record.Properties.Add(new PropertyModel(key, propertyName, type, isRequired, tracked, doc.Length > 0 ? doc : ReferencedDoc(member)) { Secret = secret });
         }
         record.ListItem = ListItemOf(record);
     }
@@ -495,6 +534,19 @@ internal sealed partial class Generator
         {
             throw new GenerationException($"{where}: no mapping value selects {member}");
         }
+        // Every value a member allows must select it, or its events would read as unknown.
+        foreach (var member in members)
+        {
+            var schemaName = _schemas.First(entry => TypeName(entry.Key) == member).Key;
+            var discriminant = AsObject(AsObject(AsObject(_schemas[schemaName], member)["properties"], member)[property], $"{member}.{property}");
+            var allowed = discriminant["enum"] is JsonArray values
+                ? values.Select(entry => entry!.GetValue<string>())
+                : [discriminant["const"]!.GetValue<string>()];
+            foreach (var value in allowed.Where(value => !union.Mapping.Contains((value, member))))
+            {
+                throw new GenerationException($"{where}: {member}.{property} allows {value}, which the discriminator does not map to it");
+            }
+        }
         Define(union);
         // An event of a type this SDK does not know yet keeps its other members as JSON.
         Define(new RecordModel(
@@ -510,6 +562,10 @@ internal sealed partial class Generator
     private TypeRef DefineEnum(string hint, string? place, List<string> values, string doc, string where)
     {
         var shared = place is null ? null : SharedEnumName(place);
+        if (shared is not null)
+        {
+            _usedPlaces.Add(place!);
+        }
         var name = shared ?? hint;
         if (_types.TryGetValue(name, out var existing))
         {
@@ -827,6 +883,7 @@ internal sealed partial class Generator
             using System;
             using System.CodeDom.Compiler;
             using System.Collections.Generic;
+            using System.Text;
             using System.Text.Json;
             using System.Text.Json.Serialization;
             using Flashpi.Internal;
@@ -916,6 +973,26 @@ internal sealed partial class Generator
             output.Append(Indent).Append(Indent).Append("_ => true,\n");
             output.Append(Indent).Append("};\n");
         }
+        if (record.HasSecret)
+        {
+            if (record.Base is not null || record.HasExtensionData)
+            {
+                throw new GenerationException($"{record.Name}: secrets are only supported on records without a base or extra members");
+            }
+            // The records' ToString() lists their members: never a secret's value.
+            output.Append('\n');
+            output.Append(Indent).Append("private bool PrintMembers(StringBuilder builder)\n");
+            output.Append(Indent).Append("{\n");
+            var separator = "";
+            foreach (var property in record.Properties)
+            {
+                var value = property.Secret ? "\"<hidden>\"" : $"(object?){property.Name}";
+                output.Append(Indent).Append(Indent).Append($"builder.Append(\"{separator}{property.Name} = \").Append({value});\n");
+                separator = ", ";
+            }
+            output.Append(Indent).Append(Indent).Append("return true;\n");
+            output.Append(Indent).Append("}\n");
+        }
         output.Append("}\n");
     }
 
@@ -969,7 +1046,7 @@ internal sealed partial class Generator
         AppendDoc(output, $"{doc} Values this version of the SDK does not know yet are kept as they are: compare with the static members, or read `Value`.", "");
         output.Append(GeneratedCode).Append('\n');
         output.Append($"[JsonConverter(typeof({name}.Converter))]\n");
-        output.Append($"public readonly partial struct {name} : IEquatable<{name}>\n{{\n");
+        output.Append($"public readonly partial struct {name} : IEquatable<{name}>, IComparable<{name}>\n{{\n");
         output.Append(Indent).Append("private readonly string? _value;\n\n");
         AppendDoc(output, "A value as the API writes it, also one this version of the SDK does not know yet.", Indent);
         output.Append(Indent).Append($"public {name}(string value) => _value = value ?? throw new ArgumentNullException(nameof(value));\n");
@@ -992,6 +1069,8 @@ internal sealed partial class Generator
         output.Append(Indent).Append($"public bool Equals({name} other) => string.Equals(Value, other.Value, StringComparison.Ordinal);\n\n");
         AppendDoc(output, "Whether the object is the same value.", Indent);
         output.Append(Indent).Append($"public override bool Equals(object? obj) => obj is {name} other && Equals(other);\n\n");
+        AppendDoc(output, "Orders the values by their text (ordinal comparison).", Indent);
+        output.Append(Indent).Append($"public int CompareTo({name} other) => string.CompareOrdinal(Value, other.Value);\n\n");
         AppendDoc(output, "A hash code of the value.", Indent);
         output.Append(Indent).Append("public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);\n\n");
         AppendDoc(output, "The value as the API writes it.", Indent);
@@ -1096,7 +1175,9 @@ internal sealed partial class Generator
     /// spans as <c>&lt;c&gt;</c>.</summary>
     private static void AppendDoc(StringBuilder output, string text, string indent)
     {
-        var escaped = text.Replace("&", "&amp;", StringComparison.Ordinal)
+        // Control characters and Unicode line breaks would end the comment's line.
+        var clean = new string([.. text.Select(character => char.IsControl(character) || character is '\u2028' or '\u2029' ? ' ' : character)]);
+        var escaped = clean.Replace("&", "&amp;", StringComparison.Ordinal)
             .Replace("<", "&lt;", StringComparison.Ordinal)
             .Replace(">", "&gt;", StringComparison.Ordinal);
         escaped = CodeSpan().Replace(escaped, "<c>$1</c>");
@@ -1140,7 +1221,11 @@ internal sealed record TypeRef(string Name, bool IsValueType, bool Nullable)
     public string Expression => Nullable ? Name + "?" : Name;
 }
 
-internal sealed record PropertyModel(string JsonName, string Name, TypeRef Type, bool Required, bool TriState, string Doc);
+internal sealed record PropertyModel(string JsonName, string Name, TypeRef Type, bool Required, bool TriState, string Doc)
+{
+    /// <summary>A secret, which the record's <c>ToString()</c> hides.</summary>
+    public bool Secret { get; init; }
+}
 
 internal abstract class TypeModel(string name, string doc)
 {
@@ -1163,6 +1248,8 @@ internal sealed class RecordModel(string name, string doc) : TypeModel(name, doc
     public bool IsQuery { get; init; }
 
     public bool HasExtensionData { get; set; }
+
+    public bool HasSecret { get; set; }
 
     /// <summary>The item type when it is a page of a list (<c>data</c> and <c>pagination</c>).</summary>
     public string? ListItem { get; set; }
