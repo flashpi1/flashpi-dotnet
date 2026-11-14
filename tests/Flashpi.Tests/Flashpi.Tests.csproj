@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- net10.0 by default. CI also runs them on net11.0 (the net10.0 build of the SDK), net8.0
+         and net48 (both use the netstandard2.0 build): -p:TestTargetFrameworks=net8.0 -->
+    <TargetFrameworks Condition="'$(TestTargetFrameworks)' == ''">net10.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(TestTargetFrameworks)' != ''">$(TestTargetFrameworks)</TargetFrameworks>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>Flashpi.Tests</RootNamespace>
+    <!-- Tests name things freely and may block on tasks. -->
+    <NoWarn>$(NoWarn);xUnit1051;CA2016;CA1711;CA1707;CA2007;CA1515;CA1861;CA2000;CA1031;CA1859;CA1849;CA5394;CA1822;CA1307;CA1310;CA1305;CA1304;CA1311</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.MTP" />
+    <PackageReference Include="xunit.v3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/Flashpi/Flashpi.csproj" />
+  </ItemGroup>
+
+  <!-- The repository's tooling targets net10.0 only: its tests run there. -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+    <ProjectReference Include="../../tools/Flashpi.Tools/Flashpi.Tools.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' != 'net10.0'">
+    <Compile Remove="Tools/**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="../../openapi/openapi.json" Link="openapi.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>
