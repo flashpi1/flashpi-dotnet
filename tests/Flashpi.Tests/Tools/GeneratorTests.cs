@@ -118,6 +118,13 @@ public sealed class GeneratorTests
     }
 
     [Fact]
+    public void Fails_once_a_whole_number_of_the_table_is_an_integer_in_the_contract()
+    {
+        var message = Fails(document => Schemas(document)["Document"]!["properties"]!["sequential"]!["type"] = "integer");
+        Assert.Contains("Table entries that match nothing in the document: Document.sequential", message);
+    }
+
+    [Fact]
     public void Fails_on_a_member_shared_by_name_with_other_values()
     {
         var message = Fails(document => Schemas(document)["Certificate"]!["properties"]!["environment"] = new JsonObject

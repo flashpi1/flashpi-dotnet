@@ -122,6 +122,26 @@ internal sealed partial class Generator
     /// <summary>Members that hold a secret: the record's <c>ToString()</c> hides them.</summary>
     private static readonly HashSet<string> SecretMembers = ["WebhookEndpointSecret.secret"];
 
+    /// <summary>
+    /// Whole numbers the contract types as <c>number</c> (the API's DTOs lack
+    /// <c>type: 'integer'</c>): they are <c>int</c>, as the API sends them. A listed member that is
+    /// no longer a number, or no longer exists, stops the generator: once the contract says
+    /// <c>integer</c>, remove it.
+    /// </summary>
+    private static readonly HashSet<string> IntegerMembers =
+    [
+        "AccountEmailSendingWindow.complaints",
+        "AccountEmailSendingWindow.hardBounces",
+        "AccountEmailSendingWindow.sent",
+        "Document.sequential",
+        "ProblemDetails.status",
+        "WebhookDelivery.attemptCount",
+        "WebhookDeliveryAttempt.durationMs",
+        "WebhookDeliveryAttempt.number",
+        "WebhookDeliveryDetail.attemptCount",
+        "WebhookEndpointVerification.attempts",
+    ];
+
     /// <summary>C# names of enum values that have no letters or digits.</summary>
     private static readonly Dictionary<string, string> MemberNames = new(StringComparer.Ordinal)
     {
@@ -178,6 +198,7 @@ internal sealed partial class Generator
     private readonly HashSet<string> _requestSchemas = new(StringComparer.Ordinal);
     private readonly HashSet<string> _usedPlaces = new(StringComparer.Ordinal);
     private readonly HashSet<string> _usedSecrets = new(StringComparer.Ordinal);
+    private readonly HashSet<string> _usedIntegers = new(StringComparer.Ordinal);
 
     public Generator(string contract)
     {
@@ -213,6 +234,7 @@ internal sealed partial class Generator
             .Concat(QueryNames.Where(entry => !_types.ContainsKey(entry.Value)).Select(entry => entry.Key))
             .Concat(EnumNames.Where(entry => !entry.Key.StartsWith('*') && !_usedPlaces.Contains(entry.Key)).Select(entry => entry.Key))
             .Concat(SecretMembers.Where(member => !_usedSecrets.Contains(member)))
+            .Concat(IntegerMembers.Where(member => !_usedIntegers.Contains(member)).Order(StringComparer.Ordinal))
             .ToList();
         if (stale.Count > 0)
         {
@@ -742,6 +764,9 @@ internal sealed partial class Generator
                 return new TypeRef("string", IsValueType: false, Nullable: false);
             case "integer":
                 return new TypeRef(format == "int64" ? "long" : "int", IsValueType: true, Nullable: false);
+            case "number" when IntegerMembers.Contains(place):
+                _usedIntegers.Add(place);
+                return new TypeRef("int", IsValueType: true, Nullable: false);
             case "number":
                 return new TypeRef("double", IsValueType: true, Nullable: false);
             case "boolean":

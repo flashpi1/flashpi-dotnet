@@ -181,17 +181,17 @@ public sealed partial record AccountEmailSendingWindow
 
     /// <summary>Emails the email provider accepted.</summary>
     [JsonPropertyName("sent")]
-    public required double Sent { get; init; }
+    public required int Sent { get; init; }
 
     /// <summary>
     /// Of those, hard bounces (<c>bounce_permanent</c>: the address or the domain does not exist).
     /// </summary>
     [JsonPropertyName("hardBounces")]
-    public required double HardBounces { get; init; }
+    public required int HardBounces { get; init; }
 
     /// <summary>Of those, emails the recipient marked as spam.</summary>
     [JsonPropertyName("complaints")]
-    public required double Complaints { get; init; }
+    public required int Complaints { get; init; }
 }
 
 /// <summary>
@@ -1321,7 +1321,7 @@ public sealed partial record Document
 
     /// <summary>The <c>sequential</c> member.</summary>
     [JsonPropertyName("sequential")]
-    public required double Sequential { get; init; }
+    public required int Sequential { get; init; }
 
     /// <summary>Establishment-emission point-sequential.</summary>
     [JsonPropertyName("number")]
@@ -4622,7 +4622,7 @@ public sealed partial record ProblemDetails
 
     /// <summary>HTTP status code.</summary>
     [JsonPropertyName("status")]
-    public required double Status { get; init; }
+    public required int Status { get; init; }
 
     /// <summary>Localized explanation of this occurrence.</summary>
     [JsonPropertyName("detail")]
@@ -5434,7 +5434,7 @@ public sealed partial record WebhookDelivery
 
     /// <summary>The <c>attemptCount</c> member.</summary>
     [JsonPropertyName("attemptCount")]
-    public required double AttemptCount { get; init; }
+    public required int AttemptCount { get; init; }
 
     /// <summary>The <c>nextAttemptAt</c> member.</summary>
     [JsonPropertyName("nextAttemptAt")]
@@ -5480,7 +5480,7 @@ public sealed partial record WebhookDeliveryAttempt
 {
     /// <summary>1 for the first attempt.</summary>
     [JsonPropertyName("number")]
-    public required double Number { get; init; }
+    public required int Number { get; init; }
 
     /// <summary>The <c>trigger</c> member.</summary>
     [JsonPropertyName("trigger")]
@@ -5492,7 +5492,7 @@ public sealed partial record WebhookDeliveryAttempt
 
     /// <summary>The <c>durationMs</c> member.</summary>
     [JsonPropertyName("durationMs")]
-    public required double DurationMs { get; init; }
+    public required int DurationMs { get; init; }
 
     /// <summary>The <c>responseStatus</c> member.</summary>
     [JsonPropertyName("responseStatus")]
@@ -5601,7 +5601,7 @@ public sealed partial record WebhookDeliveryDetail
 
     /// <summary>The <c>attemptCount</c> member.</summary>
     [JsonPropertyName("attemptCount")]
-    public required double AttemptCount { get; init; }
+    public required int AttemptCount { get; init; }
 
     /// <summary>The <c>nextAttemptAt</c> member.</summary>
     [JsonPropertyName("nextAttemptAt")]
@@ -5950,7 +5950,7 @@ public sealed partial record WebhookEndpointVerification
 
     /// <summary>Attempts of the current handshake.</summary>
     [JsonPropertyName("attempts")]
-    public required double Attempts { get; init; }
+    public required int Attempts { get; init; }
 
     /// <summary>The <c>lastAttemptAt</c> member.</summary>
     [JsonPropertyName("lastAttemptAt")]

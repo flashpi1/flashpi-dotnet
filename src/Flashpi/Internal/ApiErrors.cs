@@ -95,7 +95,7 @@ internal static class ApiErrors
                 {
                     Type = Member(root, "type")!,
                     Title = Member(root, "title")!,
-                    Status = root.TryGetProperty("status", out var status) && status.ValueKind == JsonValueKind.Number ? status.GetDouble() : 0,
+                    Status = root.TryGetProperty("status", out var status) && status.ValueKind == JsonValueKind.Number && status.TryGetInt32(out var number) ? number : 0,
                     Detail = Member(root, "detail")!,
                     Instance = Member(root, "instance")!,
                     Code = new ErrorCode(code.GetString()!),
