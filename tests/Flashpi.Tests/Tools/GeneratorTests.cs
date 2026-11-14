@@ -69,4 +69,51 @@ public sealed class GeneratorTests
         var message = Fails(document => Schemas(document)["Document"]!["properties"]!["status"]!["enum"]!.AsArray().Add("pending-sri"));
         Assert.Contains("several values are named PendingSri", message);
     }
+
+    [Fact]
+    public void Fails_on_a_schema_name_that_is_not_an_identifier()
+    {
+        var message = Fails(document =>
+        {
+            var schemas = Schemas(document);
+            schemas["Evil{}"] = new JsonObject { ["type"] = "object", ["properties"] = new JsonObject { ["a"] = new JsonObject { ["type"] = "string" } } };
+        });
+        Assert.Contains("The schema name Evil{} is not a PascalCase C# identifier", message);
+    }
+
+    [Fact]
+    public void Keeps_line_breaks_of_the_document_out_of_the_comments()
+    {
+        var document = JsonNode.Parse(Contract())!.AsObject();
+        Schemas(document)["Pagination"]!["properties"]!["hasMore"]!["description"] = "x";
+        Schemas(document)["Status"]!["properties"]!["status"]!["enum"]!.AsArray().Add("evil\u2028}class X{");
+        var models = new Generator(document.ToJsonString()).Generate();
+        Assert.DoesNotContain("\u2028", models);
+        Assert.Contains("/// <summary><c>evil }class X{</c>.</summary>", models);
+    }
+
+    [Fact]
+    public void Fails_on_parameters_declared_for_a_whole_path()
+    {
+        var message = Fails(document => document["paths"]!["/v1/events"]!["parameters"] = new JsonArray());
+        Assert.Contains("Parameters declared for a whole path", message);
+    }
+
+    [Fact]
+    public void Fails_on_an_event_type_the_discriminator_does_not_map()
+    {
+        var message = Fails(document => Schemas(document)["CertificateEvent"]!["properties"]!["type"]!["enum"]!.AsArray().Add("certificate.expired"));
+        Assert.Contains("CertificateEvent.type allows certificate.expired, which the discriminator does not map to it", message);
+    }
+
+    [Fact]
+    public void Fails_on_table_entries_that_match_nothing()
+    {
+        var message = Fails(document =>
+        {
+            var operation = document["paths"]!["/v1/events"]!["get"]!.AsObject();
+            operation["parameters"] = new JsonArray();
+        });
+        Assert.Contains("Table entries that match nothing in the document: eventsList", message);
+    }
 }
