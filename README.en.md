@@ -26,8 +26,9 @@ Ecuador's SRI, for .NET and C#.
 dotnet add package Flashpi
 ```
 
-On .NET Framework, use C# 11 or later (`<LangVersion>latest</LangVersion>` in the project): the
-models have `required` and `init` properties.
+In .NET Framework projects and `netstandard2.0` libraries, use C# 11 or later
+(`<LangVersion>latest</LangVersion>` in the project): the models have `required` and `init`
+properties, which Visual Basic cannot set.
 
 ## Getting started
 

@@ -27,8 +27,9 @@ Ecuador, para .NET y C#.
 dotnet add package Flashpi
 ```
 
-En .NET Framework usa C# 11 o superior (`<LangVersion>latest</LangVersion>` en el proyecto): los
-modelos tienen propiedades `required` e `init`.
+En proyectos de .NET Framework y en bibliotecas `netstandard2.0` usa C# 11 o superior
+(`<LangVersion>latest</LangVersion>` en el proyecto): los modelos tienen propiedades `required` e
+`init`, que Visual Basic no puede asignar.
 
 ## Primeros pasos
 

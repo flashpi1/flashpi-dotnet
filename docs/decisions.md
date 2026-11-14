@@ -68,18 +68,23 @@ and are listed so they can be confirmed or changed before 1.0.
   in `DefaultHeaders` or `ExtraHeaders` are sent only with a body; a JSON body is always
   `application/json` and a multipart one keeps its boundary.
 - **Models.** `sealed partial record`s with `init` properties; members the schema requires are
-  `required`, so the compiler asks for them (on .NET Framework, C# 11 or later). Answers are read
-  leniently, as the other SDKs read them: a member the contract requires but the answer lacks reads
-  as its default instead of failing, and unknown members are ignored, except in `ProblemDetails`
-  and `UnknownEvent`, which keep them in a settable `AdditionalProperties` (System.Text.Json
-  cannot fill extension data through a constructor). `date-time` is `DateTimeOffset`; `date`,
+  `required`, so the compiler asks for them (in .NET Framework projects and netstandard2.0
+  libraries, C# 11 or later; Visual Basic cannot set them). Answers are read leniently, as the
+  other SDKs read them: a member the contract requires but the answer lacks, or sends as `null`,
+  reads as its default instead of failing, and unknown members are ignored, except in
+  `ProblemDetails` and `UnknownEvent`, which keep them in a settable `AdditionalProperties`
+  (System.Text.Json cannot fill extension data through a constructor). The `ToString()` of
+  `WebhookEndpointSecret` hides its secret (a table of secret members in the generator). `date-time` is `DateTimeOffset`; `date`,
   `uuid`, amounts and quantities stay strings (`DateOnly` is not in netstandard2.0); `integer` is
   `int` (`long` for `int64`) and `number` is `double`.
 - **Enums.** Extensible `readonly struct`s: a value the SDK does not know yet still reads (and
-  compares by its `Value`), with a static member per known value, `==`, and an implicit conversion
-  from text (`IdType = "ruc"`). In C#, a `null` in a conditional such as
-  `cond ? new RimpeRegime(x) : null` converts through that conversion (the compiler warns):
-  `default(RimpeRegime?)` avoids it. Inline enums are named after their schema and member
+  compares by its `Value`), with a static member per known value, `==`, ordinal ordering
+  (`IComparable`), use as dictionary keys in JSON, and an implicit conversion from text
+  (`IdType = "ruc"`). A null text converts to the default (empty) value, as a JSON null reads, so
+  `status == null` and `status.Equals(null)` are false instead of throwing, and a null `Language`
+  sends no header. In C#, a `null` in a conditional such as `cond ? new RimpeRegime(x) : null`
+  converts through that conversion into the empty value, which the API refuses:
+  `default(RimpeRegime?)` sends `null`. Inline enums are named after their schema and member
   (`CertificateStatus`), except where one type serves several places (`FlashpiEnvironment`,
   `EventType`, `DocumentStatus`, `DocumentType`, `RimpeRegime`, `IdType`, `PaymentMethod`,
   `TaxType`, `RideStatus`, `PayloadMode`, `WebhookDeliveryStatus`), a table in the generator.
@@ -115,8 +120,11 @@ and are listed so they can be confirmed or changed before 1.0.
 - **Requests and timeouts.** Timeouts are `TimeSpan`s up to 2147483.647 s (Node's limit, and
   `CancelAfter`'s). The SDK's own `HttpClient` never follows redirects, decompresses answers, has
   an infinite `Timeout` and, on net10.0, renews pooled connections every 5 minutes (DNS changes).
-  A caller's `HttpClient` is used as it is: the caller gives it an infinite timeout and a handler
-  that does not follow redirects. Each attempt has one deadline, from sending it to reading the
+  On .NET Framework 4.7.1 and later it also lifts the limit of 2 connections per server, as .NET
+  has none, so concurrent calls do not wait for a connection while their deadline runs. A caller's
+  `HttpClient` is used as it is: the caller gives it an infinite timeout and a handler that does
+  not follow redirects. A body that does not decompress is a retried connection error, and a
+  client used after it was disposed throws `ObjectDisposedException` at once. Each attempt has one deadline, from sending it to reading the
   whole answer: a token that cancels at the timeout, which also disposes the answer, since a
   .NET Framework stream may not observe it. Cancelling through the caller's token throws
   `OperationCanceledException` with that token, and is never retried. The answer an
@@ -144,7 +152,11 @@ and are listed so they can be confirmed or changed before 1.0.
   net10.0, on net11.0 (the net10.0 build, with the .NET 11 SDK), on net8.0 and on .NET Framework
   4.8 on Windows (both with the netstandard2.0 build). A Python-like generator written in C#
   instead of NSwag or Kiota: no large dependency, a deterministic output, and a failure on any
-  construct it does not know.
+  construct it does not know (also on schema names that are not identifiers, parameters declared
+  for a whole path, an event type the discriminator does not map, a member shared by name with
+  other values, and table entries that match nothing). Text of the document never ends a comment
+  line. `global.json` rolls forward within 10.0; the .NET 11 job rolls forward on purpose. An
+  OpenAPI sync PR whose checks fail is opened as a draft.
 - **README examples.** Every `csharp` block of both READMEs becomes a file of
   `tests/Flashpi.Examples` (`readme generate`), built as a web project with the implicit usings of
   a user's project and the usings of each README's first block, so the ASP.NET Core examples
@@ -157,7 +169,9 @@ and are listed so they can be confirmed or changed before 1.0.
 - **Releases.** release-please's `simple` type updates `version.txt`; `Flashpi.csproj` and
   `src/Flashpi/Internal/SdkVersion.cs` (the User-Agent `flashpi-dotnet/<version>`) are extra files.
   A build job, with a read-only token, no secret and no cache, packs the tag with the .NET SDK
-  10.0.404 (pinned by version) and checks the package against the tag. The publish job, the only
+  10.0.404 (pinned by version, written into `global.json` with roll-forward disabled, since the
+  runner images also have newer SDKs) and checks the package against the tag. CI's "Pack and
+  install" fails on a version other than 0.0.0 whose READMEs still say it is not on NuGet. The publish job, the only
   one with `id-token: write`, checks out nothing and runs no code of the repository or of its
   dependencies: it gets a one-hour key with NuGet/login for the nuget.org account `flashpi` and
   pushes the `.nupkg` and `.snupkg` with the runner's dotnet CLI. A nuget.org trusted publishing
