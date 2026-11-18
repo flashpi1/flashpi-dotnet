@@ -78,6 +78,25 @@ public sealed class ModelsTests
     }
 
     [Fact]
+    public void Writes_a_last_payment_without_its_amount()
+    {
+        // Flashpi gives the last payment what the others leave of the total.
+        var invoice = Samples.Invoice() with
+        {
+            Payments =
+            [
+                new DocumentPayment { Method = PaymentMethod.CreditCard, Amount = "1.00" },
+                new DocumentPayment { Method = PaymentMethod.Cash },
+            ],
+        };
+        Assert.Contains(
+            "\"payments\":[{\"method\":\"credit_card\",\"amount\":\"1.00\"},{\"method\":\"cash\"}]",
+            Encoding.UTF8.GetString(Json.Serialize(invoice)));
+        var payment = new WithholdingPayment { Method = PaymentMethod.OtherFinancialSystem };
+        Assert.Equal("{\"method\":\"other_financial_system\"}", Encoding.UTF8.GetString(Json.Serialize(payment)));
+    }
+
+    [Fact]
     public void Sends_null_for_an_optional_nullable_member_only_when_it_was_set()
     {
         Assert.Equal("{}", Encoding.UTF8.GetString(Json.Serialize(new UpdateIssuer())));

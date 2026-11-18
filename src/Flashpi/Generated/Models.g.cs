@@ -213,7 +213,10 @@ public sealed partial record AccountEvent : Event
     public required AccountEmailSending Data { get; init; }
 }
 
-/// <summary>Public status of Flashpi. Placeholder until the status monitors exist.</summary>
+/// <summary>
+/// Public status of the Flashpi API. Components and SRI notices are on the status page,
+/// https://flashpi.com.ec/status.
+/// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 public sealed partial record ApiStatus
 {
@@ -1999,7 +2002,10 @@ public sealed partial record DocumentParty
     public string? Email { get; init; }
 }
 
-/// <summary>A payment. The payments must add up to the document total.</summary>
+/// <summary>
+/// A payment. The payments must add up to the document total; the last one may leave out
+/// <c>amount</c> to take the rest of the total.
+/// </summary>
 [GeneratedCode("Flashpi.Tools", "1.0")]
 public sealed partial record DocumentPayment
 {
@@ -2012,9 +2018,13 @@ public sealed partial record DocumentPayment
     [JsonPropertyName("method")]
     public required PaymentMethod Method { get; init; }
 
-    /// <summary>Amount paid with this method.</summary>
+    /// <summary>
+    /// Amount paid with this method. Only the last payment may leave it out: Flashpi gives it what
+    /// the other payments leave of the total (the whole total when it is the only one). With
+    /// several payments none can be zero (<c>zero_payment</c>), the computed one included.
+    /// </summary>
     [JsonPropertyName("amount")]
-    public required string Amount { get; init; }
+    public string? Amount { get; init; }
 
     /// <summary>Payment term in <c>termUnit</c> units. Required on purchase settlements.</summary>
     [JsonPropertyName("term")]
@@ -3132,6 +3142,9 @@ public readonly partial struct FieldErrorCode : IEquatable<FieldErrorCode>, ICom
 
     /// <summary><c>amount_mismatch</c>.</summary>
     public static FieldErrorCode AmountMismatch { get; } = new("amount_mismatch");
+
+    /// <summary><c>zero_payment</c>.</summary>
+    public static FieldErrorCode ZeroPayment { get; } = new("zero_payment");
 
     /// <summary><c>future_date</c>.</summary>
     public static FieldErrorCode FutureDate { get; } = new("future_date");
@@ -6262,9 +6275,13 @@ public sealed partial record WithholdingPayment
     [JsonPropertyName("method")]
     public required PaymentMethod Method { get; init; }
 
-    /// <summary>Amount.</summary>
+    /// <summary>
+    /// Amount. Only the last payment may leave it out: it takes what the other payments leave of
+    /// the supporting document <c>total</c>. With several payments none can be zero
+    /// (<c>zero_payment</c>).
+    /// </summary>
     [JsonPropertyName("amount")]
-    public required string Amount { get; init; }
+    public string? Amount { get; init; }
 }
 
 /// <summary>

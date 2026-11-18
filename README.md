@@ -102,6 +102,10 @@ SRI (15 s por defecto, hasta 30 s con `WaitTimeoutSeconds`) y devuelve `authoriz
 `failed`; si el SRI tarda más, devuelve `processing` o `pending_sri` y el documento sigue su
 curso.
 
+En facturas, notas de débito, liquidaciones de compra y los documentos de sustento de una
+retención, el último pago puede ir sin `Amount`: Flashpi le pone lo que los demás pagos dejan del
+total (todo, si es el único). Con varios pagos, ninguno puede ser 0 (`zero_payment`).
+
 ## Documentos
 
 ```csharp
