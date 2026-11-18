@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/flashpi1/flashpi-dotnet/compare/v0.1.0...v0.2.0) (2026-11-18)
+
+
+### Features
+
+* **models:** let the last payment leave out its amount ([8c5c2ec](https://github.com/flashpi1/flashpi-dotnet/commit/8c5c2ec0813e530ecb6159b10ca4ee6581e0de16))
+
 ## 0.1.0 (2026-11-14)
 
 
