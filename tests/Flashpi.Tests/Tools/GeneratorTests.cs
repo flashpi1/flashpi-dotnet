@@ -1,4 +1,5 @@
 using System.IO;
+using System.Linq;
 using System.Text.Json.Nodes;
 using Flashpi.Tools.OpenApi;
 using Xunit;
@@ -122,6 +123,37 @@ public sealed class GeneratorTests
     {
         var message = Fails(document => Schemas(document)["Document"]!["properties"]!["sequential"]!["type"] = "integer");
         Assert.Contains("Table entries that match nothing in the document: Document.sequential", message);
+    }
+
+    [Fact]
+    public void Writes_a_late_member_not_required_and_never_null()
+    {
+        var models = new Generator(Contract()).Generate();
+        Assert.Contains("    private readonly IReadOnlyList<CertificateWarning>? _warnings;\n", models);
+        Assert.Contains("    public IReadOnlyList<CertificateWarning> Warnings\n    {\n        get => _warnings ?? [];\n        init => _warnings = value;\n    }\n", models);
+        // The other required lists stay required.
+        Assert.Contains("    public required IReadOnlyList<Certificate> Data { get; init; }\n", models);
+    }
+
+    [Fact]
+    public void Fails_on_a_late_member_that_is_not_a_required_list_of_an_answer()
+    {
+        Assert.Contains(
+            "Table entries that match nothing in the document: Certificate.warnings",
+            Fails(document => Schemas(document)["Certificate"]!["required"]!.AsArray().Remove(
+                Schemas(document)["Certificate"]!["required"]!.AsArray().First(name => (string?)name == "warnings"))));
+        Assert.Contains(
+            "Certificate.warnings: only a list can be a late member (it reads as empty), not string",
+            Fails(document => Schemas(document)["Certificate"]!["properties"]!["warnings"] = new JsonObject { ["type"] = "string" }));
+        Assert.Contains(
+            "Certificate.warnings: a request must send it, so it cannot be a late member",
+            Fails(document => document["paths"]!["/v1/status"]!["get"]!["requestBody"] = new JsonObject
+            {
+                ["content"] = new JsonObject
+                {
+                    ["application/json"] = new JsonObject { ["schema"] = new JsonObject { ["$ref"] = "#/components/schemas/Certificate" } },
+                },
+            }));
     }
 
     [Fact]
