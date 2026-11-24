@@ -149,7 +149,11 @@ internal sealed partial class Generator
     /// set or an answer lacks it. Only lists of answers can be listed. A listed member that is not
     /// required, or no longer exists, stops the generator.
     /// </summary>
-    private static readonly HashSet<string> LateMembers = [];
+    private static readonly HashSet<string> LateMembers =
+    [
+        // Required since the contract of 2026-11-24.
+        "Certificate.warnings",
+    ];
 
     /// <summary>C# names of enum values that have no letters or digits.</summary>
     private static readonly Dictionary<string, string> MemberNames = new(StringComparer.Ordinal)
