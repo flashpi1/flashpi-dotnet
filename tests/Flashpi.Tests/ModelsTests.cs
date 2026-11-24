@@ -40,6 +40,73 @@ public sealed class ModelsTests
     }
 
     [Fact]
+    public void Reads_the_warnings_of_a_certificate()
+    {
+        var json = """
+            {"id":"c1","status":"accepted","usable":true,"ruc":"1790000000001",
+             "warnings":[{"code":"ruc_mismatch","message":"Test documents only"},{"code":"brand_new","message":"New"}]}
+            """;
+        var certificate = JsonSerializer.Deserialize(json, Json.TypeInfo<Certificate>())!;
+        Assert.Equal(CertificateStatus.Accepted, certificate.Status);
+        Assert.Equal(2, certificate.Warnings.Count);
+        Assert.Equal(CertificateWarningCode.RucMismatch, certificate.Warnings[0].Code);
+        Assert.Equal("Test documents only", certificate.Warnings[0].Message);
+        Assert.Equal("brand_new", certificate.Warnings[1].Code.Value);
+        Assert.Empty(JsonSerializer.Deserialize("{\"id\":\"c1\",\"warnings\":[]}", Json.TypeInfo<Certificate>())!.Warnings);
+        // An answer without them, or with null, reads as no warnings.
+        Assert.Empty(JsonSerializer.Deserialize("{\"id\":\"c1\"}", Json.TypeInfo<Certificate>())!.Warnings);
+        Assert.Empty(JsonSerializer.Deserialize("{\"id\":\"c1\",\"warnings\":null}", Json.TypeInfo<Certificate>())!.Warnings);
+    }
+
+    [Fact]
+    public void Creates_a_certificate_without_its_warnings_as_code_written_before_them_does()
+    {
+        // Warnings came with the contract of 2026-11-24: setting them is not required, so this
+        // still compiles, and the certificate has none.
+        var certificate = new Certificate
+        {
+            Id = Samples.Id,
+            IssuerId = Samples.OtherId,
+            Environment = FlashpiEnvironment.Test,
+            AllModes = false,
+            Status = CertificateStatus.Accepted,
+            Usable = true,
+            Subject = null,
+            IssuedBy = null,
+            SerialNumber = null,
+            ValidFrom = null,
+            ValidUntil = null,
+            Sha256Fingerprint = null,
+            Ruc = null,
+            Revocation = null,
+            Rejection = null,
+            CreatedAt = new DateTimeOffset(2026, 11, 24, 12, 0, 0, TimeSpan.Zero),
+            UpdatedAt = new DateTimeOffset(2026, 11, 24, 12, 0, 0, TimeSpan.Zero),
+        };
+        Assert.Empty(certificate.Warnings);
+        Assert.Empty((certificate with { Warnings = null! }).Warnings);
+        Assert.Equal(certificate, certificate with { });
+        Assert.Contains("\"warnings\":[]", JsonSerializer.Serialize(certificate, Json.TypeInfo<Certificate>()));
+        var warned = certificate with { Warnings = [new CertificateWarning { Code = CertificateWarningCode.RucMismatch, Message = "x" }] };
+        Assert.Contains("\"warnings\":[{\"code\":\"ruc_mismatch\",\"message\":\"x\"}]", JsonSerializer.Serialize(warned, Json.TypeInfo<Certificate>()));
+    }
+
+    [Fact]
+    public void Reads_the_failure_codes_of_the_contract_of_2026_11_24()
+    {
+        foreach (var (code, expected) in new[]
+        {
+            ("certificate_ruc_mismatch", DocumentFailureCode.CertificateRucMismatch),
+            ("sri_authorization_mismatch", DocumentFailureCode.SriAuthorizationMismatch),
+        })
+        {
+            var json = $"{{\"id\":\"d1\",\"status\":\"failed\",\"failure\":{{\"code\":\"{code}\",\"message\":\"m\"}}}}";
+            var document = JsonSerializer.Deserialize(json, Json.TypeInfo<Document>())!;
+            Assert.Equal(expected, document.Failure!.Code);
+        }
+    }
+
+    [Fact]
     public void Keeps_enum_values_this_version_does_not_know()
     {
         var document = JsonSerializer.Deserialize("{\"id\":\"d1\",\"status\":\"archived\"}", Json.TypeInfo<Document>())!;
