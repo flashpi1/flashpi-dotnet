@@ -167,17 +167,17 @@ catch (ApiException error)
 }
 ```
 
-| Clase                          | Estado | Ejemplos de `Code`                                              |
-| ------------------------------ | ------ | --------------------------------------------------------------- |
-| `BadRequestException`          | 400    | `malformed_json`, `invalid_idempotency_key`                     |
-| `AuthenticationException`      | 401    | `authentication_required`, `invalid_api_key`                    |
-| `PermissionDeniedException`    | 403    | `key_read_only`, `key_scope_mismatch`, `ip_not_allowed`         |
-| `NotFoundException`            | 404    | `not_found`                                                     |
-| `ConflictException`            | 409    | `sequential_already_used`, `ride_not_available`                 |
-| `UnprocessableEntityException` | 422    | `validation_failed`, `total_mismatch`                           |
-| `RateLimitException`           | 429    | `demo_issuer_quota_exceeded`, `account_email_limit_reached`     |
-| `InternalServerException`      | 5xx    | `internal_error`                                                |
-| `ApiConnectionException`       | —      | sin respuesta (red); `ApiTimeoutException` si se agotó el plazo |
+| Clase                          | Estado | Ejemplos de `Code`                                                                |
+| ------------------------------ | ------ | --------------------------------------------------------------------------------- |
+| `BadRequestException`          | 400    | `malformed_json`, `invalid_idempotency_key`                                       |
+| `AuthenticationException`      | 401    | `authentication_required`, `invalid_api_key`                                      |
+| `PermissionDeniedException`    | 403    | `key_read_only`, `key_scope_mismatch`, `ip_not_allowed`, `live_key_required`      |
+| `NotFoundException`            | 404    | `not_found`                                                                       |
+| `ConflictException`            | 409    | `sequential_already_used`, `ride_not_available`, `webhook_endpoint_limit_reached` |
+| `UnprocessableEntityException` | 422    | `validation_failed`, `total_mismatch`                                             |
+| `RateLimitException`           | 429    | `demo_issuer_quota_exceeded`, `account_email_limit_reached`                       |
+| `InternalServerException`      | 5xx    | `internal_error`                                                                  |
+| `ApiConnectionException`       | —      | sin respuesta (red); `ApiTimeoutException` si se agotó el plazo                   |
 
 Todas derivan de `FlashpiException`. Algunos errores traen datos extra en `error.Problem`, por
 ejemplo `DocumentId`, `Limit`, `ResetsAt` o `RideStatus`. Para recibir los mensajes en español:
@@ -374,6 +374,10 @@ Para **renovar la firma** de un emisor, para pruebas y producción a la vez, rep
 flujo con el .p12 nuevo: Flashpi reconoce el RUC (`ExistingIssuer`) y `CompleteAsync()` sin datos
 agrega el certificado. En cambio, `flashpi.Issuers.Certificates.UploadAsync(issuerId, upload)`
 sube un certificado solo para el modo de la clave que usas (pruebas o producción).
+
+Un certificado aceptado puede traer avisos en `Warnings` (vacía si no hay ninguno):
+`ruc_mismatch` es un certificado de pruebas que no es del RUC del emisor, que firma solo
+documentos de pruebas y no sirve para las claves de producción.
 
 En las actualizaciones (`UpdateAsync`) solo cambian las propiedades que asignas; asignar `null` a
 una que lo admite (como `TradeName`) la borra.

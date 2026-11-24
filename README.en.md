@@ -166,17 +166,17 @@ catch (ApiException error)
 }
 ```
 
-| Class                          | Status | Examples of `Code`                                           |
-| ------------------------------ | ------ | ------------------------------------------------------------ |
-| `BadRequestException`          | 400    | `malformed_json`, `invalid_idempotency_key`                  |
-| `AuthenticationException`      | 401    | `authentication_required`, `invalid_api_key`                 |
-| `PermissionDeniedException`    | 403    | `key_read_only`, `key_scope_mismatch`, `ip_not_allowed`      |
-| `NotFoundException`            | 404    | `not_found`                                                  |
-| `ConflictException`            | 409    | `sequential_already_used`, `ride_not_available`              |
-| `UnprocessableEntityException` | 422    | `validation_failed`, `total_mismatch`                        |
-| `RateLimitException`           | 429    | `demo_issuer_quota_exceeded`, `account_email_limit_reached`  |
-| `InternalServerException`      | 5xx    | `internal_error`                                             |
-| `ApiConnectionException`       | —      | no answer (network); `ApiTimeoutException` when it timed out |
+| Class                          | Status | Examples of `Code`                                                                |
+| ------------------------------ | ------ | --------------------------------------------------------------------------------- |
+| `BadRequestException`          | 400    | `malformed_json`, `invalid_idempotency_key`                                       |
+| `AuthenticationException`      | 401    | `authentication_required`, `invalid_api_key`                                      |
+| `PermissionDeniedException`    | 403    | `key_read_only`, `key_scope_mismatch`, `ip_not_allowed`, `live_key_required`      |
+| `NotFoundException`            | 404    | `not_found`                                                                       |
+| `ConflictException`            | 409    | `sequential_already_used`, `ride_not_available`, `webhook_endpoint_limit_reached` |
+| `UnprocessableEntityException` | 422    | `validation_failed`, `total_mismatch`                                             |
+| `RateLimitException`           | 429    | `demo_issuer_quota_exceeded`, `account_email_limit_reached`                       |
+| `InternalServerException`      | 5xx    | `internal_error`                                                                  |
+| `ApiConnectionException`       | —      | no answer (network); `ApiTimeoutException` when it timed out                      |
 
 All of them extend `FlashpiException`. Some errors carry extra data in `error.Problem`, such as
 `DocumentId`, `Limit`, `ResetsAt` or `RideStatus`. For messages in Spanish:
@@ -374,6 +374,10 @@ To **renew an issuer's signature** for test and live mode at once, repeat the sa
 new .p12: Flashpi recognizes the RUC (`ExistingIssuer`) and `CompleteAsync()` without data adds
 the certificate. `flashpi.Issuers.Certificates.UploadAsync(issuerId, upload)`, instead, uploads a
 certificate for the mode of the key you use only (test or live).
+
+An accepted certificate may carry warnings in `Warnings` (empty when there are none):
+`ruc_mismatch` is a test certificate that is not for the issuer's RUC, which signs test documents
+only and does not count for live keys.
 
 Updates (`UpdateAsync`) change only the properties you set; setting `null` on one that allows it
 (such as `TradeName`) clears it.
