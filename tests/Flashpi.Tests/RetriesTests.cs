@@ -115,6 +115,23 @@ public sealed class RetriesTests
     }
 
     [Fact]
+    public async Task Does_not_wait_an_hour_for_the_verifications_of_a_webhook_endpoint()
+    {
+        var api = new FakeApi(
+            Reply.Problem(429, "rate_limited", null, ("Retry-After", "3600")),
+            Reply.Problem(429, "rate_limited", null, ("Retry-After", "1800")));
+        using var test = new Harness(api);
+        var verify = await Assert.ThrowsAsync<RateLimitException>(() => test.Client.WebhookEndpoints.VerifyAsync(Samples.Id));
+        Assert.Equal(ErrorCode.RateLimited, verify.Code);
+        Assert.Equal(TimeSpan.FromHours(1), verify.RetryAfter);
+        var update = await Assert.ThrowsAsync<RateLimitException>(() => test.Client.WebhookEndpoints.UpdateAsync(
+            Samples.Id, new UpdateWebhookEndpoint { Url = "https://example.com/new" }));
+        Assert.Equal(TimeSpan.FromMinutes(30), update.RetryAfter);
+        Assert.Equal(2, api.Requests.Count);
+        Assert.Empty(test.Waits);
+    }
+
+    [Fact]
     public async Task Reads_a_retry_after_given_as_an_http_date()
     {
         var api = new FakeApi(Reply.Problem(503, "service_unavailable", null, ("Retry-After", "Fri, 13 Nov 2026 12:00:05 GMT")), Reply.Json(Samples.Document()));

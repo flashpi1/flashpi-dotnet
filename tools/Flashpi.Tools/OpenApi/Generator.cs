@@ -142,6 +142,19 @@ internal sealed partial class Generator
         "WebhookEndpointVerification.attempts",
     ];
 
+    /// <summary>
+    /// Members of an answer that the contract made required after their record was released. They
+    /// are not <c>required</c> in C#, which would stop code that creates the record (a test double,
+    /// for example) from compiling, and they are never null: a list reads as empty when it is not
+    /// set or an answer lacks it. Only lists of answers can be listed. A listed member that is not
+    /// required, or no longer exists, stops the generator.
+    /// </summary>
+    private static readonly HashSet<string> LateMembers =
+    [
+        // Required since the contract of 2026-11-24.
+        "Certificate.warnings",
+    ];
+
     /// <summary>C# names of enum values that have no letters or digits.</summary>
     private static readonly Dictionary<string, string> MemberNames = new(StringComparer.Ordinal)
     {
@@ -199,6 +212,7 @@ internal sealed partial class Generator
     private readonly HashSet<string> _usedPlaces = new(StringComparer.Ordinal);
     private readonly HashSet<string> _usedSecrets = new(StringComparer.Ordinal);
     private readonly HashSet<string> _usedIntegers = new(StringComparer.Ordinal);
+    private readonly HashSet<string> _usedLate = new(StringComparer.Ordinal);
 
     public Generator(string contract)
     {
@@ -235,6 +249,7 @@ internal sealed partial class Generator
             .Concat(EnumNames.Where(entry => !entry.Key.StartsWith('*') && !_usedPlaces.Contains(entry.Key)).Select(entry => entry.Key))
             .Concat(SecretMembers.Where(member => !_usedSecrets.Contains(member)))
             .Concat(IntegerMembers.Where(member => !_usedIntegers.Contains(member)).Order(StringComparer.Ordinal))
+            .Concat(LateMembers.Where(member => !_usedLate.Contains(member)).Order(StringComparer.Ordinal))
             .ToList();
         if (stale.Count > 0)
         {
@@ -469,8 +484,25 @@ internal sealed partial class Generator
                 _usedSecrets.Add($"{placeKey}.{key}");
                 record.HasSecret = true;
             }
+            var late = isRequired && LateMembers.Contains($"{placeKey}.{key}");
+            if (late)
+            {
+                if (request)
+                {
+                    throw new GenerationException($"{where}.{key}: a request must send it, so it cannot be a late member");
+                }
+                if (type.Nullable || !type.Name.StartsWith("IReadOnlyList<", StringComparison.Ordinal))
+                {
+                    throw new GenerationException($"{where}.{key}: only a list can be a late member (it reads as empty), not {type.Expression}");
+                }
+                _usedLate.Add($"{placeKey}.{key}");
+            }
             var doc = Describe(member);
-            record.Properties.Add(new PropertyModel(key, propertyName, type, isRequired, tracked, doc.Length > 0 ? doc : ReferencedDoc(member)) { Secret = secret });
+            record.Properties.Add(new PropertyModel(key, propertyName, type, isRequired && !late, tracked, doc.Length > 0 ? doc : ReferencedDoc(member))
+            {
+                Secret = secret,
+                Late = late,
+            });
         }
         record.ListItem = ListItemOf(record);
     }
@@ -1030,8 +1062,15 @@ internal sealed partial class Generator
 
     private static void EmitProperty(StringBuilder output, RecordModel record, PropertyModel property)
     {
-        var type = property.Type with { Nullable = property.Type.Nullable || !property.Required };
+        var type = property.Type with { Nullable = property.Type.Nullable || !(property.Required || property.Late) };
         var doc = property.Doc.Length > 0 ? property.Doc : $"The `{property.JsonName}` member.";
+        if (property.Late)
+        {
+            // System.Text.Json sets an init-only member an answer lacks to null, past any
+            // initializer: the getter reads null as an empty list instead.
+            doc += " Never null: an empty list when the record is created without it or an answer lacks it.";
+            output.Append(Indent).Append($"private readonly {type.Expression}? _{property.JsonName};\n\n");
+        }
         if (property.TriState)
         {
             doc += " Left out of the request unless set: set it to null to send null.";
@@ -1056,6 +1095,15 @@ internal sealed partial class Generator
             output.Append(Indent).Append(Indent).Append(Indent).Append($"_{property.JsonName} = value;\n");
             output.Append(Indent).Append(Indent).Append(Indent).Append($"_{property.JsonName}IsSet = true;\n");
             output.Append(Indent).Append(Indent).Append("}\n");
+            output.Append(Indent).Append("}\n");
+            return;
+        }
+        if (property.Late)
+        {
+            output.Append(Indent).Append($"public {type.Expression} {property.Name}\n");
+            output.Append(Indent).Append("{\n");
+            output.Append(Indent).Append(Indent).Append($"get => _{property.JsonName} ?? [];\n");
+            output.Append(Indent).Append(Indent).Append($"init => _{property.JsonName} = value;\n");
             output.Append(Indent).Append("}\n");
             return;
         }
@@ -1257,6 +1305,12 @@ internal sealed record PropertyModel(string JsonName, string Name, TypeRef Type,
 {
     /// <summary>A secret, which the record's <c>ToString()</c> hides.</summary>
     public bool Secret { get; init; }
+
+    /// <summary>
+    /// Required by the contract since after its record was released: not <c>required</c> in C#,
+    /// and an empty list when it is not set or an answer lacks it.
+    /// </summary>
+    public bool Late { get; init; }
 }
 
 internal abstract class TypeModel(string name, string doc)

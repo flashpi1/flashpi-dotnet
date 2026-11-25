@@ -89,6 +89,9 @@ changes. The generator fails on anything it does not know (a new union, a new li
 without a name for its query, ...): extend it, or its tables at the top of
 `tools/Flashpi.Tools/OpenApi/Generator.cs`. New operations need a method. A contract that now
 types one of the whole numbers of `IntegerMembers` as `integer` fails it too: remove the entry.
+A list the contract adds as required to an existing answer goes in `LateMembers`: as a `required`
+member it would stop code that creates the record from compiling. The generator cannot tell, so
+look for new `required` members in the diff of the models.
 
 ## Commits and releases
 

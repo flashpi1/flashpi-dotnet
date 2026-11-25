@@ -8,6 +8,19 @@ unless an entry says otherwise. Entries marked as the owner's were taken with th
 owner; the others were chosen while porting, after the Python SDK where the owner had not decided,
 and are listed so they can be confirmed or changed before 1.0.
 
+## 2026-11-24: the contract of 2026-11-24
+
+### Chosen while syncing (to be confirmed by the owner)
+
+- **Members made required later.** The contract adds `warnings` to `Certificate` as a required
+  list. As a `required` member it would stop code that creates a `Certificate` (a test double, for
+  example) from compiling, which a patch must not do. The generator writes the members of its
+  `LateMembers` table without `required`, as lists that are never null: empty when the record is
+  created without them or an answer lacks them (System.Text.Json sets an init-only member an
+  answer lacks to null, past any initializer, so the getter reads null as empty). Only lists of
+  answers can be listed: a request's new required member is something the API asks of its users.
+  The sync is a `fix:`, so release-please proposes 0.2.1.
+
 ## 2026-11-14: before 0.1.0
 
 ### The owner's decisions

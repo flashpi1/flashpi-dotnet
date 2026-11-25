@@ -360,6 +360,20 @@ public sealed partial record Certificate
     [JsonPropertyName("rejection")]
     public required CertificateRejection? Rejection { get; init; }
 
+    private readonly IReadOnlyList<CertificateWarning>? _warnings;
+
+    /// <summary>
+    /// Warnings about an accepted certificate (empty when there are none). A test certificate that
+    /// is not for the issuer's RUC is accepted with <c>ruc_mismatch</c>. Never null: an empty list
+    /// when the record is created without it or an answer lacks it.
+    /// </summary>
+    [JsonPropertyName("warnings")]
+    public IReadOnlyList<CertificateWarning> Warnings
+    {
+        get => _warnings ?? [];
+        init => _warnings = value;
+    }
+
     /// <summary>The <c>createdAt</c> member.</summary>
     [JsonPropertyName("createdAt")]
     public required DateTimeOffset CreatedAt { get; init; }
@@ -638,6 +652,79 @@ public readonly partial struct CertificateStatus : IEquatable<CertificateStatus>
     }
 }
 
+/// <summary>Something to fix about an accepted certificate that does not stop it signing.</summary>
+[GeneratedCode("Flashpi.Tools", "1.0")]
+public sealed partial record CertificateWarning
+{
+    /// <summary>
+    /// <c>ruc_mismatch</c>: a test certificate that is not for the issuer's RUC. It signs test
+    /// documents only and does not count for live API keys; in live mode such a certificate is
+    /// rejected (<c>rejection.code</c> <c>ruc_mismatch</c>).
+    /// </summary>
+    [JsonPropertyName("code")]
+    public required CertificateWarningCode Code { get; init; }
+
+    /// <summary>The <c>message</c> member.</summary>
+    [JsonPropertyName("message")]
+    public required string Message { get; init; }
+}
+
+/// <summary>
+/// <c>ruc_mismatch</c>: a test certificate that is not for the issuer's RUC. It signs test
+/// documents only and does not count for live API keys; in live mode such a certificate is rejected
+/// (<c>rejection.code</c> <c>ruc_mismatch</c>). Values this version of the SDK does not know yet
+/// are kept as they are: compare with the static members, or read <c>Value</c>.
+/// </summary>
+[GeneratedCode("Flashpi.Tools", "1.0")]
+[JsonConverter(typeof(CertificateWarningCode.Converter))]
+public readonly partial struct CertificateWarningCode : IEquatable<CertificateWarningCode>, IComparable<CertificateWarningCode>
+{
+    private readonly string? _value;
+
+    /// <summary>
+    /// A value as the API writes it, also one this version of the SDK does not know yet.
+    /// </summary>
+    public CertificateWarningCode(string value) => _value = value ?? throw new ArgumentNullException(nameof(value));
+
+    /// <summary><c>ruc_mismatch</c>.</summary>
+    public static CertificateWarningCode RucMismatch { get; } = new("ruc_mismatch");
+
+    /// <summary>The value as the API writes it (empty for the default value).</summary>
+    public string Value => _value ?? string.Empty;
+
+    /// <summary>Whether both values are the same.</summary>
+    public static bool operator ==(CertificateWarningCode left, CertificateWarningCode right) => left.Equals(right);
+
+    /// <summary>Whether the values differ.</summary>
+    public static bool operator !=(CertificateWarningCode left, CertificateWarningCode right) => !left.Equals(right);
+
+    /// <summary>
+    /// The value of a text as the API writes it; null is the default (empty) value, as a JSON null
+    /// reads.
+    /// </summary>
+    public static implicit operator CertificateWarningCode(string? value) => value is null ? default : new(value);
+
+    /// <summary>Whether both values are the same (ordinal comparison).</summary>
+    public bool Equals(CertificateWarningCode other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
+
+    /// <summary>Whether the object is the same value.</summary>
+    public override bool Equals(object? obj) => obj is CertificateWarningCode other && Equals(other);
+
+    /// <summary>Orders the values by their text (ordinal comparison).</summary>
+    public int CompareTo(CertificateWarningCode other) => string.CompareOrdinal(Value, other.Value);
+
+    /// <summary>A hash code of the value.</summary>
+    public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
+
+    /// <summary>The value as the API writes it.</summary>
+    public override string ToString() => Value;
+
+    internal sealed class Converter : ExtensibleEnumConverter<CertificateWarningCode>
+    {
+        protected override CertificateWarningCode Create(string value) => new(value);
+    }
+}
+
 /// <summary>
 /// The issuer to create, with the same fields as POST /v1/issuers (legalName, headOfficeAddress and
 /// taxProfile are required for a new issuer). For a renewal (<c>existingIssuer</c>) the body may be
@@ -647,9 +734,10 @@ public readonly partial struct CertificateStatus : IEquatable<CertificateStatus>
 public sealed partial record CompleteIssuerOnboarding : IPresenceTracked
 {
     /// <summary>
-    /// Required when the RUC did not come from the certificate (<c>rucNeedsConfirmation</c>): the
-    /// proposed RUC or another one whose first 10 digits are the holder's cédula. Otherwise it may
-    /// be left out, and must be the certificate's RUC when sent (422 <c>ruc_mismatch</c>).
+    /// Required when the RUC did not come from the certificate (<c>rucNeedsConfirmation</c>), and
+    /// then it must be the proposed RUC (for a certificate that states only a cédula, that cédula
+    /// followed by 001). Otherwise it may be left out, and must be the certificate's RUC when sent.
+    /// Any other RUC gets 422 <c>ruc_mismatch</c>.
     /// </summary>
     [JsonPropertyName("ruc")]
     public string? Ruc { get; init; }
@@ -754,7 +842,9 @@ public sealed partial record CreateCreditNote
     /// <summary>
     /// Additional information printed on the document (name → value, 1 to 300 characters each). A
     /// document carries at most 15 fields including the legends Flashpi adds (RUC Proveedor, and
-    /// Gran Contribuyente for large taxpayers), so at most 13 or 14 of yours.
+    /// Gran Contribuyente for large taxpayers), so at most 13 or 14 of yours. Not accepted with the
+    /// shared demo issuer (422 demo_issuer_free_text_not_allowed), whose documents carry only the
+    /// legend "Aviso: DOCUMENTO DE PRUEBA SIN VALIDEZ TRIBUTARIA - SANDBOX FLASHPI".
     /// </summary>
     [JsonPropertyName("additionalInfo")]
     public IReadOnlyDictionary<string, string>? AdditionalInfo { get; init; }
@@ -823,7 +913,9 @@ public sealed partial record CreateDebitNote
     /// <summary>
     /// Additional information printed on the document (name → value, 1 to 300 characters each). A
     /// document carries at most 15 fields including the legends Flashpi adds (RUC Proveedor, and
-    /// Gran Contribuyente for large taxpayers), so at most 13 or 14 of yours.
+    /// Gran Contribuyente for large taxpayers), so at most 13 or 14 of yours. Not accepted with the
+    /// shared demo issuer (422 demo_issuer_free_text_not_allowed), whose documents carry only the
+    /// legend "Aviso: DOCUMENTO DE PRUEBA SIN VALIDEZ TRIBUTARIA - SANDBOX FLASHPI".
     /// </summary>
     [JsonPropertyName("additionalInfo")]
     public IReadOnlyDictionary<string, string>? AdditionalInfo { get; init; }
@@ -918,7 +1010,9 @@ public sealed partial record CreateInvoice
     /// <summary>
     /// Additional information printed on the document (name → value, 1 to 300 characters each). A
     /// document carries at most 15 fields including the legends Flashpi adds (RUC Proveedor, and
-    /// Gran Contribuyente for large taxpayers), so at most 13 or 14 of yours.
+    /// Gran Contribuyente for large taxpayers), so at most 13 or 14 of yours. Not accepted with the
+    /// shared demo issuer (422 demo_issuer_free_text_not_allowed), whose documents carry only the
+    /// legend "Aviso: DOCUMENTO DE PRUEBA SIN VALIDEZ TRIBUTARIA - SANDBOX FLASHPI".
     /// </summary>
     [JsonPropertyName("additionalInfo")]
     public IReadOnlyDictionary<string, string>? AdditionalInfo { get; init; }
@@ -1054,7 +1148,9 @@ public sealed partial record CreatePurchaseSettlement
     /// <summary>
     /// Additional information printed on the document (name → value, 1 to 300 characters each). A
     /// document carries at most 15 fields including the legends Flashpi adds (RUC Proveedor, and
-    /// Gran Contribuyente for large taxpayers), so at most 13 or 14 of yours.
+    /// Gran Contribuyente for large taxpayers), so at most 13 or 14 of yours. Not accepted with the
+    /// shared demo issuer (422 demo_issuer_free_text_not_allowed), whose documents carry only the
+    /// legend "Aviso: DOCUMENTO DE PRUEBA SIN VALIDEZ TRIBUTARIA - SANDBOX FLASHPI".
     /// </summary>
     [JsonPropertyName("additionalInfo")]
     public IReadOnlyDictionary<string, string>? AdditionalInfo { get; init; }
@@ -1119,7 +1215,9 @@ public sealed partial record CreateWaybill
     /// <summary>
     /// Additional information printed on the document (name → value, 1 to 300 characters each). A
     /// document carries at most 15 fields including the legends Flashpi adds (RUC Proveedor, and
-    /// Gran Contribuyente for large taxpayers), so at most 13 or 14 of yours.
+    /// Gran Contribuyente for large taxpayers), so at most 13 or 14 of yours. Not accepted with the
+    /// shared demo issuer (422 demo_issuer_free_text_not_allowed), whose documents carry only the
+    /// legend "Aviso: DOCUMENTO DE PRUEBA SIN VALIDEZ TRIBUTARIA - SANDBOX FLASHPI".
     /// </summary>
     [JsonPropertyName("additionalInfo")]
     public IReadOnlyDictionary<string, string>? AdditionalInfo { get; init; }
@@ -1239,7 +1337,9 @@ public sealed partial record CreateWithholding
     /// <summary>
     /// Additional information printed on the document (name → value, 1 to 300 characters each). A
     /// document carries at most 15 fields including the legends Flashpi adds (RUC Proveedor, and
-    /// Gran Contribuyente for large taxpayers), so at most 13 or 14 of yours.
+    /// Gran Contribuyente for large taxpayers), so at most 13 or 14 of yours. Not accepted with the
+    /// shared demo issuer (422 demo_issuer_free_text_not_allowed), whose documents carry only the
+    /// legend "Aviso: DOCUMENTO DE PRUEBA SIN VALIDEZ TRIBUTARIA - SANDBOX FLASHPI".
     /// </summary>
     [JsonPropertyName("additionalInfo")]
     public IReadOnlyDictionary<string, string>? AdditionalInfo { get; init; }
@@ -1272,7 +1372,10 @@ public sealed partial record CreateWithholding
 [GeneratedCode("Flashpi.Tools", "1.0")]
 public sealed partial record DebitNoteReason
 {
-    /// <summary>Reason.</summary>
+    /// <summary>
+    /// Reason. With the shared demo issuer at most 291 characters (422
+    /// demo_issuer_description_too_long): Flashpi starts it with "PRUEBA - ".
+    /// </summary>
     [JsonPropertyName("description")]
     public required string Description { get; init; }
 
@@ -1772,6 +1875,9 @@ public readonly partial struct DocumentFailureCode : IEquatable<DocumentFailureC
     /// <summary><c>certificate_unusable</c>.</summary>
     public static DocumentFailureCode CertificateUnusable { get; } = new("certificate_unusable");
 
+    /// <summary><c>certificate_ruc_mismatch</c>.</summary>
+    public static DocumentFailureCode CertificateRucMismatch { get; } = new("certificate_ruc_mismatch");
+
     /// <summary><c>document_too_large</c>.</summary>
     public static DocumentFailureCode DocumentTooLarge { get; } = new("document_too_large");
 
@@ -1792,6 +1898,9 @@ public readonly partial struct DocumentFailureCode : IEquatable<DocumentFailureC
 
     /// <summary><c>sri_environment_mismatch</c>.</summary>
     public static DocumentFailureCode SriEnvironmentMismatch { get; } = new("sri_environment_mismatch");
+
+    /// <summary><c>sri_authorization_mismatch</c>.</summary>
+    public static DocumentFailureCode SriAuthorizationMismatch { get; } = new("sri_authorization_mismatch");
 
     /// <summary>The value as the API writes it (empty for the default value).</summary>
     public string Value => _value ?? string.Empty;
@@ -1844,7 +1953,10 @@ public sealed partial record DocumentItem
     [JsonPropertyName("auxiliaryCode")]
     public string? AuxiliaryCode { get; init; }
 
-    /// <summary>Description.</summary>
+    /// <summary>
+    /// Description. With the shared demo issuer at most 291 characters (422
+    /// demo_issuer_description_too_long): Flashpi starts it with "PRUEBA - ".
+    /// </summary>
     [JsonPropertyName("description")]
     public required string Description { get; init; }
 
@@ -1871,7 +1983,8 @@ public sealed partial record DocumentItem
     public required IReadOnlyList<DocumentTax> Taxes { get; init; }
 
     /// <summary>
-    /// Up to 3 extra details printed with the line (name → value, 1 to 300 characters).
+    /// Up to 3 extra details printed with the line (name → value, 1 to 300 characters). Not
+    /// accepted with the shared demo issuer (422 demo_issuer_free_text_not_allowed).
     /// </summary>
     [JsonPropertyName("additionalDetails")]
     public IReadOnlyDictionary<string, string>? AdditionalDetails { get; init; }
@@ -2600,6 +2713,9 @@ public readonly partial struct ErrorCode : IEquatable<ErrorCode>, IComparable<Er
     /// <summary><c>ip_not_allowed</c>.</summary>
     public static ErrorCode IpNotAllowed { get; } = new("ip_not_allowed");
 
+    /// <summary><c>live_key_required</c>.</summary>
+    public static ErrorCode LiveKeyRequired { get; } = new("live_key_required");
+
     /// <summary><c>invalid_idempotency_key</c>.</summary>
     public static ErrorCode InvalidIdempotencyKey { get; } = new("invalid_idempotency_key");
 
@@ -2686,6 +2802,9 @@ public readonly partial struct ErrorCode : IEquatable<ErrorCode>, IComparable<Er
 
     /// <summary><c>webhook_delivery_in_progress</c>.</summary>
     public static ErrorCode WebhookDeliveryInProgress { get; } = new("webhook_delivery_in_progress");
+
+    /// <summary><c>webhook_endpoint_limit_reached</c>.</summary>
+    public static ErrorCode WebhookEndpointLimitReached { get; } = new("webhook_endpoint_limit_reached");
 
     /// <summary><c>sandbox_not_enabled</c>.</summary>
     public static ErrorCode SandboxNotEnabled { get; } = new("sandbox_not_enabled");
@@ -3182,8 +3301,17 @@ public readonly partial struct FieldErrorCode : IEquatable<FieldErrorCode>, ICom
     /// <summary><c>demo_issuer_sequential_not_allowed</c>.</summary>
     public static FieldErrorCode DemoIssuerSequentialNotAllowed { get; } = new("demo_issuer_sequential_not_allowed");
 
+    /// <summary><c>demo_issuer_free_text_not_allowed</c>.</summary>
+    public static FieldErrorCode DemoIssuerFreeTextNotAllowed { get; } = new("demo_issuer_free_text_not_allowed");
+
+    /// <summary><c>demo_issuer_description_too_long</c>.</summary>
+    public static FieldErrorCode DemoIssuerDescriptionTooLong { get; } = new("demo_issuer_description_too_long");
+
     /// <summary><c>ruc_mismatch</c>.</summary>
     public static FieldErrorCode RucMismatch { get; } = new("ruc_mismatch");
+
+    /// <summary><c>certificate_ruc_missing</c>.</summary>
+    public static FieldErrorCode CertificateRucMissing { get; } = new("certificate_ruc_missing");
 
     /// <summary>The value as the API writes it (empty for the default value).</summary>
     public string Value => _value ?? string.Empty;
@@ -4670,7 +4798,8 @@ public sealed partial record ProblemDetails
 
     /// <summary>
     /// The daily limit that was reached (<c>email_resend_limit_reached</c>,
-    /// <c>account_email_limit_reached</c>, <c>demo_issuer_quota_exceeded</c>).
+    /// <c>account_email_limit_reached</c>, <c>demo_issuer_quota_exceeded</c>), or the most webhook
+    /// endpoints an account may have in a mode (<c>webhook_endpoint_limit_reached</c>).
     /// </summary>
     [JsonPropertyName("limit")]
     public int? Limit { get; init; }
@@ -5336,7 +5465,10 @@ public sealed partial record WaybillItem
     [JsonPropertyName("auxiliaryCode")]
     public string? AuxiliaryCode { get; init; }
 
-    /// <summary>Description.</summary>
+    /// <summary>
+    /// Description. With the shared demo issuer at most 291 characters (422
+    /// demo_issuer_description_too_long): Flashpi starts it with "PRUEBA - ".
+    /// </summary>
     [JsonPropertyName("description")]
     public required string Description { get; init; }
 
@@ -5344,7 +5476,10 @@ public sealed partial record WaybillItem
     [JsonPropertyName("quantity")]
     public required string Quantity { get; init; }
 
-    /// <summary>Up to 3 extra details (name → value).</summary>
+    /// <summary>
+    /// Up to 3 extra details (name → value). Not accepted with the shared demo issuer (422
+    /// demo_issuer_free_text_not_allowed).
+    /// </summary>
     [JsonPropertyName("additionalDetails")]
     public IReadOnlyDictionary<string, string>? AdditionalDetails { get; init; }
 }
@@ -6357,6 +6492,7 @@ public readonly partial struct WithholdingTax : IEquatable<WithholdingTax>, ICom
 [JsonSerializable(typeof(CertificateListParams))]
 [JsonSerializable(typeof(CertificateRejection))]
 [JsonSerializable(typeof(CertificateRevocation))]
+[JsonSerializable(typeof(CertificateWarning))]
 [JsonSerializable(typeof(CompleteIssuerOnboarding))]
 [JsonSerializable(typeof(CompletedIssuerOnboarding))]
 [JsonSerializable(typeof(CreateCreditNote))]

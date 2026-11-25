@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Flashpi.Internal;
 using Flashpi.Models;
@@ -57,6 +58,35 @@ public sealed class ErrorsTests
         Assert.Equal(DocumentStatus.Authorized, error.Problem.DocumentStatus);
         Assert.Equal(1, error.Problem.AdditionalProperties!["somethingNew"].GetProperty("a").GetInt32());
         Assert.Equal("application/problem+json", error.GetHeader("content-type"));
+    }
+
+    [Fact]
+    public async Task Recognizes_the_codes_of_the_contract_of_2026_11_24()
+    {
+        var api = new FakeApi(
+            Reply.Problem(403, "live_key_required"),
+            Reply.Problem(409, "webhook_endpoint_limit_reached", new { limit = 20 }),
+            Reply.Problem(422, "validation_failed", new
+            {
+                errors = new[]
+                {
+                    new { field = "items[0].description", code = "demo_issuer_description_too_long", message = "Long" },
+                    new { field = "additionalInfo", code = "demo_issuer_free_text_not_allowed", message = "Free text" },
+                    new { field = "ruc", code = "certificate_ruc_missing", message = "No RUC" },
+                },
+            }));
+        using var test = new Harness(api);
+        var live = await Assert.ThrowsAsync<PermissionDeniedException>(() => test.Client.Issuers.UpdateAsync(Samples.Id, new UpdateIssuer()));
+        Assert.Equal(ErrorCode.LiveKeyRequired, live.Code);
+        var limit = await Assert.ThrowsAsync<ConflictException>(() => test.Client.WebhookEndpoints.CreateAsync(
+            new CreateWebhookEndpoint { Url = "https://example.com/hook", EnabledEvents = [EventType.All] }));
+        Assert.Equal(ErrorCode.WebhookEndpointLimitReached, limit.Code);
+        Assert.Equal(20, limit.Problem!.Limit);
+        var invalid = await Assert.ThrowsAsync<UnprocessableEntityException>(() => test.Client.Invoices.CreateAsync(Samples.Invoice()));
+        Assert.Equal(
+            new[] { FieldErrorCode.DemoIssuerDescriptionTooLong, FieldErrorCode.DemoIssuerFreeTextNotAllowed, FieldErrorCode.CertificateRucMissing },
+            invalid.Errors.Select(field => field.Code));
+        Assert.Equal(3, api.Requests.Count);
     }
 
     [Fact]
