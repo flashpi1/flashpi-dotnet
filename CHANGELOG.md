@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/flashpi1/flashpi-dotnet/compare/v0.2.0...v0.2.1) (2026-11-25)
+
+
+### Bug fixes
+
+* **models:** sync the API contract of 2026-11-24 ([0946e1f](https://github.com/flashpi1/flashpi-dotnet/commit/0946e1ff5a76a8a9e22947917b1bd36d1750dcb5))
+
 ## [0.2.0](https://github.com/flashpi1/flashpi-dotnet/compare/v0.1.0...v0.2.0) (2026-11-18)
 
 
